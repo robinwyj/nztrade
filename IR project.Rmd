@@ -1,0 +1,204 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot(cars)
+
+help ("as.numeric")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Find Electorate By Occupation
+(```{r}
+library(readxl)
+read_excel("Downloads/Electorateprofilesrawdata8.xls", 
+    sheet = "22")
+```{r}
+
+
+
+
+library(readxl)
+url <- "https://www.parliament.nz/resource/en-NZ/00PlibDBHOH_Lib_EP_Data1/cd6ddbd064bd40f0975d0d55a9238c4cf51967cf"
+destfile <- "cd6ddbd064bd40f0975d0d55a9238c4cf51967cf.xls"
+curl::curl_download(url, destfile)
+df <- read_excel(destfile, sheet=22)
+
+?read_excel()
+library(readxl)
+Electorateprofilesrawdata8 <- read_excel("~/Downloads/Electorateprofilesrawdata8.xls", 
+    sheet  = 22, skip=1)
+View(Electorateprofilesrawdata8)
+
+colnames(df)
+colnames(df)[1] <- "industry"
+df[1,]
+colnames(df) <- c(df[1,])
+
+new <-df[-1,]
+new <-new[-64,]
+new <-new[-65,]
+new <-new[-72,]
+new <- new[-64,]
+
+new[new==NA] <- 0
+
+for (i in 2:21) {
+ new[,i] <- as.numeric(new[,i])
+ new[,i] <-  new[,i]/ sum( new[,i])
+}
+
+
+new$electoratesum <- rowSums(new) 
+
+colnames (new)
+new$`Agriculture, forestry and fishing` <- as.numeric(new$`Agriculture, forestry and fishing`)
+
+
+sum(new$`Agriculture, forestry and fishing`)
+new$Agriculture <-new$`Agriculture, forestry and fishing`/ sum(new$`Agriculture, forestry and fishing`)
+
+
+new$Mining [new$Mining=="..C"] <- NA
+new$Mining <- as.numeric(new$Mining)
+
+new$mining[!is.na(new$Mining)] <- new$Mining[!is.na(new$Mining)]/ sum(new$Mining[!is.na(new$Mining)])
+
+new$Manufacturing <- as.numeric(new$Manufacturing)
+sum(new$Manufacturing)
+new$manufacture <- new$Manufacturing/ sum(new$Manufacturing)
+
+new$`Electricity, gas, water and waste services` <- as.numeric(new$`Electricity, gas, water and waste services`)
+sum (new$`Electricity, gas, water and waste services`)
+new$public <- new$`Electricity, gas, water and waste services`/sum (new$`Electricity, gas, water and waste services`)
+
+new$Construction <-as.numeric(new$Construction)
+sum (new$Construction)
+new$building  <- new$Construction /sum(new$Construction)
+
+new$`Wholesale trade`<- as.numeric(new$`Wholesale trade`)
+sum (new$`Wholesale trade`)
+new$wholesale <- new$`Wholesale trade` /sum(new$`Wholesale trade`)
+
+new$`Retail trade` <- as.numeric(new$`Retail trade` )
+sum (new$`Retail trade`)
+new$Retail <- new$`Retail trade` /sum(new$`Retail trade`)
+
+new$Accommodation<- as.numeric(new$Accommodation )
+sum (new$Accommodation)
+new$accomodation  <- new$Accommodation /sum(new$Accommodation)
+
+new$`Transport, postal and warehousing` <- as.numeric(new$`Transport, postal and warehousing`)
+sum (new$`Transport, postal and warehousing`)
+new$`transport, postal and warehousing` <- new$`Transport, postal and warehousing`/sum(new$`Transport, postal and warehousing`)
+
+new$`Information media and telecommunications`<-as.numeric(new$`Information media and telecommunications`)
+new$telecom <- new$`Information media and telecommunications`/sum(new$`Information media and telecommunications`)
+
+new$`Financial and insurance services` <- as.numeric(new$`Financial and insurance services`)
+new$finance <- new$`Financial and insurance services` /sum (new$`Financial and insurance services` )
+
+new$`Rental, hiring and real estate services` <- as.numeric(new$`Rental, hiring and real estate services`)
+new$rent <- new$`Rental, hiring and real estate services` /sum (new$`Rental, hiring and real estate services` )
+
+new$`Professional, scientific and technical services`<- as.numeric(new$`Professional, scientific and technical services`)
+new$rd <- new$`Professional, scientific and technical services` /sum(new$`Professional, scientific and technical services` )
+
+new$`Administrative and support services` <- as.numeric(new$`Administrative and support services`)
+new$admin <- new$`Administrative and support services` /sum(new$`Administrative and support services` )
+
+new$`Public administration and safety` <- as.numeric(new$`Public administration and safety`)
+new$`pubadmin` <- new$`Public administration and safety` /sum(new$`Public administration and safety` )
+
+new$`Education and training` <- as.numeric(new$`Education and training`)
+new$education <- new$`Education and training` /sum(new$`Education and training` )
+
+new$`Health care and social assistance` <- as.numeric(new$`Health care and social assistance`)
+new$health <- new$`Health care and social assistance` /sum(new$`Health care and social assistance` )
+
+new$`Arts and recreation services` <- as.numeric(new$`Arts and recreation services`)
+new$art <- new$`Arts and recreation services` /sum(new$`Arts and recreation services` )
+
+new$`Other services` <- as.numeric(new$`Other services`)
+new$other <- new$`Other services` /sum(new$`Other services` )
+
+rowsum.data.frame(new)
+```
+
+d
+apply(new, 2, sum)
+colSums(new$`Agriculture, forestry and fishing`)
+
+```{r}
+
+library(readxl)
+Electorateprofilesrawdata8 <- read_excel("~/Downloads/Electorateprofilesrawdata8.xls")
+
+
+new2020<- electorate_profiles_2020_data_file
+
+new2020 <- new2020[,c(1,27:46)]
+new2020 <- new2020[c(7:73),]
+new2020 <- new2020 [-2,]
+
+colnames(new2020) <- c(new2020[1,])
+new2020 <- new2020[-1,]
+new2020 <- new2020 [,-21]
+colnames(new2020)[1] <- "Electorate"
+
+
+for (i in 2:20) {
+ new2020[,i] <- as.numeric(new2020[,i])
+ new2020[,i] <-  new2020[,i]/ sum( new2020[,i])
+}
+
+
+
+
+```
+
+
+Elecotrate Votes
+data$incumbent <- data$Party_00 == data$Party_01
+```{r}
+library(readr)
+winning_electorate_candidates <- read_csv("~/Downloads/winning-electorate-candidates.csv", 
+    skip = 1)
+vote2020<-(winning_electorate_candidates)
+
+vote2020<- vote2020[,c(1,3)]
+
+library(readr)
+winning_electorate_candidates_2 <- read_csv("~/Downloads/winning-electorate-candidates-2.csv", 
+    skip = 1)
+vote2017 <- winning_electorate_candidates_2
+vote2017 <- vote2017[,c(1,3)]
+
+votechange <- merge (vote2017,vote2020, by="Electoral District")
+
+library(readr)
+votes_for_registered_parties_by_electorate <- read_csv("~/Downloads/votes-for-registered-parties-by-electorate.csv", 
+    skip = 1)
+partyvotes2017 <- votes_for_registered_parties_by_electorate
+
+library(readr)
+votes_for_registered_parties_by_electorate_3 <- read_csv("~/Downloads/votes-for-registered-parties-by-electorate-3.csv",
+    skip = 1)
+partyvotes2020 <- votes_for_registered_parties_by_electorate_3
+
+partyvotes2020 <- partyvotes2020[c(1:65),]
+partyvotes2017 <- partyvotes2017[c(1:64),]
+
+partyvotechange <- merge(partyvotes2017, partyvotes2020, by="Electorate")
+```
