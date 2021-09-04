@@ -1,14 +1,11 @@
-
-library(readxl)
-EP08<- read_excel("~/Desktop/IR/2008 Electorate Profile .xls")
+EP08<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
  EP08 <- EP08[1:63,]                                                                                                   
  EP08 <- EP08[,1:20]
  
  EP08$Mining [EP08$Mining=="..C"] <- 0
  
- 
  # Error in asnumeirc function
- EP08 <- for (i in 2:22) {
+ EP08 <- for (i in 3:20) {
    EP08[,i] <- as.numeric(EP08[,i])
    EP08[,i] <-  EP08[,i]/ sum( EP08[,i])
  }
