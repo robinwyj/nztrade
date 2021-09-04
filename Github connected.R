@@ -15,12 +15,14 @@ EP08<- read_excel("~/Desktop/IR/2008 Electorate Profile .xls")
  
  
  EP17 <- read_excel("~/Downloads/Electorate-profiles---raw-data.xlsx")
- EP17 <- EP17 [,1:20]
+ EP17 <- EP17 [,2:20]
  EP17 <- for (i in 2:22) {
    EP08[,i] <- as.numeric(EP17[,i])
    EP08[,i] <-  EP17[,i]/ sum( EP17[,i])
  }
- write.csv(EP17, "Electorate Profile 2017")
+ 
+ 
+
  
  
  
@@ -51,4 +53,8 @@ EP08<- read_excel("~/Desktop/IR/2008 Electorate Profile .xls")
  colnames(votechange)[2]<- "2017"
  colnames(votechange)[3]<- "2020" 
  
- 
+ write.csv(votechange, "2017-2020 votechange")
+ write.csv(EP17, "ElectorateProfile17")
+ write.csv(EP20, "ElectorateProfile20")
+ write.csv(EP08, "ElectorateProfile08")
+ read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile17")
