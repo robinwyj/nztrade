@@ -1,0 +1,49 @@
+"","Electorate","2008","2008 percentage","2014.x","2014 percentage.x","Incumbent2008-2014","2017.x","2017 percentage.x","Incumbent2014-2017","2020","2020 percentage","Incumbent2017-2020"
+"1","Auckland Central","National Party","42.91%","National Party","45.84%",TRUE,"National Party","45.25%",TRUE,"Green Party","35.48%",FALSE
+"2","Bay of Plenty","National Party","64.88%","National Party","60.69%",TRUE,"National Party","61.05%",TRUE,"National Party","44.94%",TRUE
+"3","Botany","National Party","56.22%","National Party","65.12%",TRUE,"National Party","62.85%",TRUE,"National Party","52.46%",TRUE
+"4","Christchurch Central","Labour Party","43.83%","National Party","46.22%",FALSE,"Labour Party","47.93%",FALSE,"Labour Party","60.33%",TRUE
+"5","Christchurch East","Labour Party","52.92%","Labour Party","48.09%",TRUE,"Labour Party","54.44%",TRUE,"Labour Party","63.28%",TRUE
+"6","Coromandel","National Party","63.05%","National Party","58.72%",TRUE,"National Party","55.09%",TRUE,"National Party","45.60%",TRUE
+"7","East Coast","National Party","52.46%","National Party","52.38%",TRUE,"National Party","46.70%",TRUE,"Labour Party","51.70%",FALSE
+"8","East Coast Bays","National Party","58.09%","National Party","61.92%",TRUE,"National Party","66.06%",TRUE,"National Party","54.86%",TRUE
+"9","Epsom","ACT New Zealand","56.06%","ACT New Zealand","43.42%",TRUE,"ACT New Zealand","43.17%",TRUE,"ACT New Zealand","47.53%",TRUE
+"10","Hamilton East","National Party","58.58%","National Party","57.37%",TRUE,"National Party","53.44%",TRUE,"Labour Party","47.69%",FALSE
+"11","Hamilton West","National Party","48.79%","National Party","53.10%",TRUE,"National Party","52.82%",TRUE,"Labour Party","53.04%",FALSE
+"12","Hauraki-Waikato","Labour Party","52.49%","Labour Party","61.56%",TRUE,"Labour Party","71.56%",TRUE,"Labour Party","68.01%",TRUE
+"13","Hutt South","Labour Party","49.28%","Labour Party","43.80%",TRUE,"National Party","47.88%",FALSE,"Labour Party","50.00%",FALSE
+"14","Ilam","National Party","56.89%","National Party","58.08%",TRUE,"National Party","46.60%",TRUE,"Labour Party","46.57%",FALSE
+"15","Invercargill","National Party","55.97%","National Party","52.09%",TRUE,"National Party","51.05%",TRUE,"National Party","45.49%",TRUE
+"16","Mana","Labour Party","53.06%","Labour Party","54.81%",TRUE,"Labour Party","59.36%",TRUE,"Labour Party","61.99%",TRUE
+"17","Manurewa","Labour Party","53.96%","Labour Party","54.23%",TRUE,"Labour Party","58.78%",TRUE,"Labour Party","73.04%",TRUE
+"18","Maungakiekie","National Party","45.55%","National Party","48.38%",TRUE,"National Party","44.01%",TRUE,"Labour Party","44.80%",FALSE
+"19","Mt Albert","Labour Party","59.29%","Labour Party","58.71%",TRUE,"Labour Party","64.48%",TRUE,"Labour Party","71.60%",TRUE
+"20","Mt Roskill","Labour Party","55.80%","Labour Party","56.52%",TRUE,"Labour Party","55.26%",TRUE,"Labour Party","61.84%",TRUE
+"21","Napier","National Party","59.70%","Labour Party","42.72%",FALSE,"Labour Party","54.23%",TRUE,"Labour Party","51.97%",TRUE
+"22","Nelson","National Party","57.13%","National Party","53.37%",TRUE,"National Party","40.69%",TRUE,"Labour Party","48.70%",FALSE
+"23","New Lynn","Labour Party","50.35%","Labour Party","50.89%",TRUE,"Labour Party","47.05%",TRUE,"Labour Party","57.06%",TRUE
+"24","New Plymouth","National Party","48.18%","National Party","58.42%",TRUE,"National Party","52.59%",TRUE,"Labour Party","48.34%",FALSE
+"25","North Shore","National Party","61.85%","National Party","63.15%",TRUE,"National Party","60.50%",TRUE,"National Party","46.19%",TRUE
+"26","Northcote","National Party","57.87%","National Party","57.02%",TRUE,"National Party","52.77%",TRUE,"Labour Party","48.66%",FALSE
+"27","Northland","National Party","59.14%","National Party","52.74%",TRUE,"National Party","38.30%",TRUE,"Labour Party","38.11%",FALSE
+"28","Pakuranga","National Party","61.58%","National Party","61.03%",TRUE,"National Party","64.91%",TRUE,"National Party","59.27%",TRUE
+"29","Palmerston North","Labour Party","46.82%","Labour Party","50.08%",TRUE,"Labour Party","53.09%",TRUE,"Labour Party","59.56%",TRUE
+"30","Papakura","National Party","59.68%","National Party","46.76%",TRUE,"National Party","55.63%",TRUE,"National Party","49.98%",TRUE
+"31","Rangitata","National Party","57.86%","National Party","67.24%",TRUE,"National Party","53.56%",TRUE,"Labour Party","50.33%",FALSE
+"32","Rongotai","Labour Party","52.45%","Labour Party","49.83%",TRUE,"Labour Party","52.34%",TRUE,"Labour Party","58.11%",TRUE
+"33","Rotorua","National Party","53.91%","National Party","56.34%",TRUE,"National Party","53.37%",TRUE,"National Party","43.29%",TRUE
+"34","Selwyn","National Party","60.49%","National Party","69.97%",TRUE,"National Party","66.22%",TRUE,"National Party","49.55%",TRUE
+"35","Taranaki-King Country","National Party","68.67%","National Party","68.17%",TRUE,"National Party","66.41%",TRUE,"National Party","47.15%",TRUE
+"36","Tauranga","National Party","56.81%","National Party","56.88%",TRUE,"National Party","54.77%",TRUE,"National Party","43.47%",TRUE
+"37","Te Tai Tokerau","Maori Party","61.95%","Labour Party","44.73%",FALSE,"Labour Party","53.97%",TRUE,"Labour Party","56.77%",TRUE
+"38","Te Tai Tonga","Maori Party","47.30%","Labour Party","42.92%",FALSE,"Labour Party","45.89%",TRUE,"Labour Party","50.40%",TRUE
+"39","Tukituki","National Party","57.18%","National Party","52.55%",TRUE,"National Party","47.99%",TRUE,"Labour Party","46.32%",FALSE
+"40","Waiariki","Maori Party","68.17%","Māori Party","45.56%",FALSE,"Labour Party","53.74%",FALSE,"Māori Party","46.78%",FALSE
+"41","Waikato","National Party","63.44%","National Party","65.67%",TRUE,"National Party","62.18%",TRUE,"National Party","51.97%",TRUE
+"42","Waimakariri","Labour Party","44.09%","National Party","48.60%",FALSE,"National Party","57.60%",TRUE,"National Party","46.73%",TRUE
+"43","Wairarapa","National Party","51.02%","National Party","43.90%",TRUE,"National Party","41.40%",TRUE,"Labour Party","49.65%",FALSE
+"44","Waitaki","National Party","60.13%","National Party","62.98%",TRUE,"National Party","57.46%",TRUE,"National Party","45.16%",TRUE
+"45","Wellington Central","Labour Party","42.18%","Labour Party","52.01%",TRUE,"Labour Party","49.26%",TRUE,"Labour Party","57.73%",TRUE
+"46","West Coast-Tasman","National Party","46.51%","Labour Party","47.29%",FALSE,"Labour Party","49.54%",TRUE,"Labour Party","48.46%",TRUE
+"47","Whanganui","National Party","56.30%","National Party","53.69%",TRUE,"National Party","45.60%",TRUE,"Labour Party","55.73%",FALSE
+"48","Wigram","Jim Anderton's Progressive","44.50%","Labour Party","48.95%",FALSE,"Labour Party","52.31%",TRUE,"Labour Party","63.45%",TRUE
