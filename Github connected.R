@@ -155,9 +155,11 @@ colnames(EP20)[1] <- "Electorate"
  
  # Test
  #load datasets. We are using three years but there are more. 
+ icio_08 <- read.csv()
  icio_07 <- read.csv("~/Documents/ICIO2016_2007.csv")
  icio_00 <- read.csv("~/Documents/ICIO2016_2000.csv")
  icio_95 <- read.csv("ICIO2016_1995.csv")
+ 
  
  
  all_cty <- unique(substr(colnames(icio_07), 1, 3))[-1]
@@ -239,5 +241,16 @@ chn_nzl_exp_07 <- data.frame(industry = substr(colnames(icio_07_chn_cn2),
                              exp_val = chn_nzl_exp_07)
 
 
-"95+00" <- merge (chn_nzl_exp_95, chn_nzl_exp_00, by="industry")
+tradechange <- merge (chn_nzl_exp_95, chn_nzl_exp_00, by="industry")
+colnames(tradechange)[2] <- "exp95"
+colnames(tradechange)[3] <- "exp00"
+
+tradechange$"change95-00" <- tradechange[,3] - tradechange[,2]
+
+tradechange <- merge (tradechange, chn_nzl_exp_07, by="industry")
+colnames(tradechange)[5] <- "exp07"
+
+tradechange$"change00-07" <- tradechange[,5] - tradechange [,3]
+
+
 
