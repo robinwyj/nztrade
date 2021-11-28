@@ -1,3 +1,4 @@
+#Electorate Profile for yeras 2006, 2013,2018
 EP06<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
  EP06 <- EP06[1:63,]                                                                                                   
  EP06 <- EP06[,2:20]
@@ -43,6 +44,67 @@ write.csv(EP06, "Electorate Profile 2006")
 
 
 
+# Vote results for the 2008, 2011, 2014 elections
+library(readr)
+
+e08 <- read_csv("~/Downloads/e9_part6-4.csv", 
+                skip = 1)
+
+e11 <- read_csv("~/Downloads/e9_part6-5.csv", 
+                skip = 1)
+
+e14 <- read_csv("~/Downloads/e9_part6.csv", 
+                skip = 1)
+
+e17 <- read_csv("~/Downloads/winning-electorate-candidates-3.csv", 
+                skip = 1)
+
+e08 <- e08 [,c(1,3,6)]
+colnames(e08)[1]<-"Electorate"
+e11 <- e11 [,c(1,3,6)]
+colnames(e11)[1]<-"Electorate"
+e14 <- e14 [,c(1,3,6)]
+colnames(e14)[1]<-"Electorate"
+e17 <- e17 [,c(1,3,6)]
+colnames(e17)[1]<-"Electorate"
+
+colnames(e08)[2] <- "Party 2008"
+colnames(e11)[2] <- "Party 2011"
+colnames(e14)[2] <- "Party 2014"
+colnames(e17)[2] <- "Party 2017"
+
+colnames(e08)[3] <- "Percentage of Vote Recieved 2008"
+colnames(e11)[3] <- "Percentage of Vote Recieved 2011"
+colnames(e14)[3] <- "Percentage of Vote Recieved 2014"
+colnames(e17)[3] <- "Percentage of Vote Recieved 2017"
+
+e08$`Percentage of Vote Recieved 2008` <- gsub("%", "", e08$`Percentage of Vote Recieved 2008`)
+e08$`Percentage of Vote Recieved 2008`<- as.numeric(e08$`Percentage of Vote Recieved 2008`)
+
+e11$`Percentage of Vote Recieved 2011` <- gsub("%", "", e11$`Percentage of Vote Recieved 2011`)
+e11$`Percentage of Vote Recieved 2011`<- as.numeric(e11$`Percentage of Vote Recieved 2011`)
+
+e14$`Percentage of Vote Recieved 2014` <- gsub("%", "", e14$`Percentage of Vote Recieved 2014`)
+e14$`Percentage of Vote Recieved 2014`<- as.numeric(e14$`Percentage of Vote Recieved 2014`)
+
+e17$`Percentage of Vote Recieved 2017` <- gsub("%", "", e17$`Percentage of Vote Recieved 2017`)
+e17$`Percentage of Vote Recieved 2017`<- as.numeric(e17$`Percentage of Vote Recieved 2017`)
+
+
+dataset1 <- merge (e08,e11, by="Electorate")
+dataset1$"Incumbent 2008-2011" <- dataset1$"Party 2008" == dataset1$"Party 2011"
+dataset1$"Winning Margin Percentage 2008-2011" <- dataset1[,5]- dataset1[,3]
+
+dataset1 <- merge (dataset1,e14, by="Electorate")
+dataset1$"Incumbent 2011-2014" <- dataset1$"Party 2011" == dataset1$"Party 2014"
+dataset1$"Winning Margin Percentage 2011-2014" <- dataset1[,9]- dataset1[,5]
+
+dataset1 <- merge (dataset1,e17, by="Electorate")
+dataset1$"Incumbent 2014-2017" <- dataset1$"Party 2014" == dataset1$"Party 2017"
+dataset1$"Winning Margin Percentage 2014-2017" <- dataset1[13]- dataset1[,9]
+colnames(dataset1)[15] <- "Winning Margin Percentage 2014-2017"
+
+write.csv(dataset1, "Election Results 2008-2017")
 
 
 
@@ -279,64 +341,3 @@ tradechange$"change00-07" <- tradechange[,5] - tradechange [,3]
 
 
 
-# Vote results for the 2008, 2011, 2014 elections
-library(readr)
-
-e08 <- read_csv("~/Downloads/e9_part6-4.csv", 
-            skip = 1)
-
-e11 <- read_csv("~/Downloads/e9_part6-5.csv", 
-                       skip = 1)
-
-e14 <- read_csv("~/Downloads/e9_part6.csv", 
-                     skip = 1)
-
-e17 <- read_csv("~/Downloads/winning-electorate-candidates-3.csv", 
-                                            skip = 1)
-
-e08 <- e08 [,c(1,3,6)]
-colnames(e08)[1]<-"Electorate"
-e11 <- e11 [,c(1,3,6)]
-colnames(e11)[1]<-"Electorate"
-e14 <- e14 [,c(1,3,6)]
-colnames(e14)[1]<-"Electorate"
-e17 <- e17 [,c(1,3,6)]
-colnames(e17)[1]<-"Electorate"
-
-colnames(e08)[2] <- "Party 2008"
-colnames(e11)[2] <- "Party 2011"
-colnames(e14)[2] <- "Party 2014"
-colnames(e17)[2] <- "Party 2017"
-
-colnames(e08)[3] <- "Percentage of Vote Recieved 2008"
-colnames(e11)[3] <- "Percentage of Vote Recieved 2011"
-colnames(e14)[3] <- "Percentage of Vote Recieved 2014"
-colnames(e17)[3] <- "Percentage of Vote Recieved 2017"
-
-e08$`Percentage of Vote Recieved 2008` <- gsub("%", "", e08$`Percentage of Vote Recieved 2008`)
-e08$`Percentage of Vote Recieved 2008`<- as.numeric(e08$`Percentage of Vote Recieved 2008`)
-
-e11$`Percentage of Vote Recieved 2011` <- gsub("%", "", e11$`Percentage of Vote Recieved 2011`)
-e11$`Percentage of Vote Recieved 2011`<- as.numeric(e11$`Percentage of Vote Recieved 2011`)
-
-e14$`Percentage of Vote Recieved 2014` <- gsub("%", "", e14$`Percentage of Vote Recieved 2014`)
-e14$`Percentage of Vote Recieved 2014`<- as.numeric(e14$`Percentage of Vote Recieved 2014`)
-
-e17$`Percentage of Vote Recieved 2017` <- gsub("%", "", e17$`Percentage of Vote Recieved 2017`)
-e17$`Percentage of Vote Recieved 2017`<- as.numeric(e17$`Percentage of Vote Recieved 2017`)
-
-
-dataset1 <- merge (e08,e11, by="Electorate")
-dataset1$"Incumbent 2008-2011" <- dataset1$"Party 2008" == dataset1$"Party 2011"
-dataset1$"Winning Margin Percentage 2008-2011" <- dataset1[,5]- dataset1[,3]
-
-dataset1 <- merge (dataset1,e14, by="Electorate")
-dataset1$"Incumbent 2011-2014" <- dataset1$"Party 2011" == dataset1$"Party 2014"
-dataset1$"Winning Margin Percentage 2011-2014" <- dataset1[,9]- dataset1[,5]
-
-dataset1 <- merge (dataset1,e17, by="Electorate")
-dataset1$"Incumbent 2014-2017" <- dataset1$"Party 2014" == dataset1$"Party 2017"
-dataset1$"Winning Margin Percentage 2014-2017" <- dataset1[13]- dataset1[,9]
-colnames(dataset1)[15] <- "Winning Margin Percentage 2014-2017"
-
-write.csv(dataset1, "Election Results 2008-2017")
