@@ -227,70 +227,92 @@ write.csv(dataset1, "Election Results 2008-2017")
  
  # Test
  #load datasets. We are using three years but there are more. 
- icio_08 <- read.csv()
- icio_07 <- read.csv("~/Documents/ICIO2016_2007.csv")
- icio_00 <- read.csv("~/Documents/ICIO2016_2000.csv")
+library(readr)
+ 
  icio_95 <- read.csv("ICIO2016_1995.csv")
+ icio_00 <- read.csv("~/Documents/ICIO2016_2000.csv")
  icio_05 <- read.csv("icio_2016/ICIO2016_2005.csv")
-
+ icio_07 <- read.csv("~/Documents/ICIO2016_2007.csv")
+ icio_08 <- read.csv("~/Desktop/ICIO2021_2008.csv")
+ icio_11 <- read.csv("~/Desktop/ICIO2021_2011.csv")
+ icio_14 <- read.csv("~/Desktop/ICIO2021_2014.csv")
+ 
+ 
  
  
  all_cty <- unique(substr(colnames(icio_07), 1, 3))[-1]
  all_cty <- all_cty[-c(72:length(all_cty))]
  all_cty <- all_cty[!all_cty== "NZL"]
  
- #two matrice for 1995
- icio_95_chn_cn2 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN2"), 
+
+  icio_95_chn_cn2 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN2"), 
                                        substr(colnames(icio_95), 1, 3) == "NZL"])
  
  icio_95_chn_cn3 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN3"), 
                                        substr(colnames(icio_95), 1, 3) == "NZL"])
  
- 
- 
- #two matrice for 2000
- icio_00_chn_cn2 <- data.frame(icio_00[substr(icio_00$X, 1, 3) %in% c ("CN2"), 
+  icio_00_chn_cn2 <- data.frame(icio_00[substr(icio_00$X, 1, 3) %in% c ("CN2"), 
                                        substr(colnames(icio_00), 1, 3) == "NZL"])
  
  icio_00_chn_cn3 <- data.frame(icio_00[substr(icio_00$X, 1, 3) %in% c ("CN3"), 
                                        substr(colnames(icio_00), 1, 3) == "NZL"])
  
- #two matrice for 2007
+ icio_05_chn_cn2 <- data.frame(icio_05[substr(icio_07$X, 1, 3) %in% c ("CN2"), 
+                                       substr(colnames(icio_05), 1, 3) == "NZL"])
+ 
+ icio_05_chn_cn3 <- data.frame(icio_05[substr(icio_07$X, 1, 3) %in% c ("CN3"), 
+                                       substr(colnames(icio_05), 1, 3) == "NZL"])
+ 
  icio_07_chn_cn2 <- data.frame(icio_07[substr(icio_07$X, 1, 3) %in% c ("CN2"), 
                                        substr(colnames(icio_07), 1, 3) == "NZL"])
  
  icio_07_chn_cn3 <- data.frame(icio_07[substr(icio_07$X, 1, 3) %in% c ("CN3"), 
                                        substr(colnames(icio_07), 1, 3) == "NZL"])
  
+  icio_08_chn_cn1 <- data.frame(icio_08[substr(icio_08$X, 1, 3) %in% c ("CN1"), 
+                                       substr(colnames(icio_08), 1, 3) == "NZL"])
  
- #two matrice for 1995
- #generate cn2 
+ icio_08_chn_cn2 <- data.frame(icio_08[substr(icio_08$X, 1, 3) %in% c ("CN2"), 
+                                       substr(colnames(icio_08), 1, 3) == "NZL"])
+ icio_08_chn_cn1 <- icio_08_chn_cn1[,1:45]
+ icio_08_chn_cn2 <- icio_08_chn_cn2[,1:45]
+ 
+ icio_11_chn_cn1 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("CN1"), 
+                                       substr(colnames(icio_11), 1, 3) == "NZL"])
+ 
+ icio_11_chn_cn2 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("CN2"), 
+                                       substr(colnames(icio_11), 1, 3) == "NZL"])
+ icio_11_chn_cn1 <- icio_11_chn_cn1[,1:45]
+ icio_11_chn_cn2 <- icio_11_chn_cn2[,1:45]
+ 
+ 
+ icio_14_chn_cn1 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("CN1"), 
+                                       substr(colnames(icio_14), 1, 3) == "NZL"])
+ 
+ icio_14_chn_cn2 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("CN2"), 
+                                       substr(colnames(icio_14), 1, 3) == "NZL"])
+ 
+ icio_14_chn_cn1 <- icio_14_chn_cn1[,1:45]
+ icio_14_chn_cn2 <- icio_14_chn_cn2[,1:45]
+ 
+ 
+ 
+
  icio_95_chn_cn2 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN2"), 
                                        substr(colnames(icio_95), 1, 3) == "NZL"])
- 
-#sum up each row of cn2 for Chinese export to NZL for each industry 
-icio_95_chn_cn2_sum <- rowSums(icio_95_chn_cn2)
-#generate cn3
+ icio_95_chn_cn2_sum <- rowSums(icio_95_chn_cn2)
 icio_95_chn_cn3 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN3"), 
                                       substr(colnames(icio_95), 1, 3) == "NZL"])
-#same for cn3
 icio_95_chn_cn3_sum <- rowSums(icio_95_chn_cn3)
-#sum up cn2 and cn3 
 chn_nzl_exp_95 <- icio_95_chn_cn2_sum + icio_95_chn_cn3_sum
-#create a dataset `chn_nzl_exp_95`. It has two columns: the first column is the name of each Chinese industry; the second column is the corresponding Chinese exports to NZL 
 chn_nzl_exp_95 <- data.frame(industry = substr(colnames(icio_95_chn_cn2), 
                                                5, nchar(colnames(icio_95_chn_cn2))), 
                              exp_val = chn_nzl_exp_95)
 
 
 
-icio_00_chn_cn2 <- data.frame(icio_00[substr(icio_00$X, 1, 3) %in% c ("CN2"), 
-                                      substr(colnames(icio_00), 1, 3) == "NZL"])
 
 icio_00_chn_cn2_sum <- rowSums(icio_00_chn_cn2)
-
-icio_00_chn_cn3 <- data.frame(icio_00[substr(icio_00$X, 1, 3) %in% c ("CN3"), 
-                                      substr(colnames(icio_00), 1, 3) == "NZL"])
 icio_00_chn_cn3_sum <- rowSums(icio_00_chn_cn3)
 chn_nzl_exp_00 <- icio_00_chn_cn2_sum + icio_00_chn_cn3_sum
 chn_nzl_exp_00 <- data.frame(industry = substr(colnames(icio_00_chn_cn2), 
@@ -298,14 +320,7 @@ chn_nzl_exp_00 <- data.frame(industry = substr(colnames(icio_00_chn_cn2),
                              exp_val = chn_nzl_exp_00)
 
 
-
-icio_05_chn_cn2 <- data.frame(icio_05[substr(icio_07$X, 1, 3) %in% c ("CN2"), 
-                                      substr(colnames(icio_05), 1, 3) == "NZL"])
-
 icio_05_chn_cn2_sum <- rowSums(icio_05_chn_cn2)
-
-icio_05_chn_cn3 <- data.frame(icio_05[substr(icio_05$X, 1, 3) %in% c ("CN3"), 
-                                      substr(colnames(icio_05), 1, 3) == "NZL"])
 icio_05_chn_cn3_sum <- rowSums(icio_05_chn_cn3)
 chn_nzl_exp_05 <- icio_05_chn_cn2_sum + icio_05_chn_cn3_sum
 chn_nzl_exp_05 <- data.frame(industry = substr(colnames(icio_05_chn_cn2), 
@@ -313,12 +328,9 @@ chn_nzl_exp_05 <- data.frame(industry = substr(colnames(icio_05_chn_cn2),
                              exp_val = chn_nzl_exp_05)
 
 
-
 icio_07_chn_cn2 <- data.frame(icio_07[substr(icio_07$X, 1, 3) %in% c ("CN2"), 
                                       substr(colnames(icio_07), 1, 3) == "NZL"])
-
 icio_07_chn_cn2_sum <- rowSums(icio_07_chn_cn2)
-
 icio_07_chn_cn3 <- data.frame(icio_07[substr(icio_07$X, 1, 3) %in% c ("CN3"), 
                                       substr(colnames(icio_07), 1, 3) == "NZL"])
 icio_07_chn_cn3_sum <- rowSums(icio_07_chn_cn3)
@@ -328,16 +340,43 @@ chn_nzl_exp_07 <- data.frame(industry = substr(colnames(icio_07_chn_cn2),
                              exp_val = chn_nzl_exp_07)
 
 
-tradechange <- merge (chn_nzl_exp_95, chn_nzl_exp_00, by="industry")
-colnames(tradechange)[2] <- "exp95"
-colnames(tradechange)[3] <- "exp00"
+icio_08_chn_cn1_sum <- rowSums(icio_08_chn_cn1)
+icio_08_chn_cn2_sum <- rowSums(icio_08_chn_cn2)
+chn_nzl_exp_08 <- icio_08_chn_cn1_sum + icio_08_chn_cn2_sum
+chn_nzl_exp_08 <- data.frame(industry = substr(colnames(icio_08_chn_cn2), 
+                                               5, nchar(colnames(icio_08_chn_cn2))), 
+                             exp_val = chn_nzl_exp_08)
 
-tradechange$"change95-00" <- tradechange[,3] - tradechange[,2]
+icio_11_chn_cn1_sum <- rowSums(icio_11_chn_cn1)
+icio_11_chn_cn2_sum <- rowSums(icio_11_chn_cn2)
+chn_nzl_exp_11 <- icio_11_chn_cn1_sum + icio_11_chn_cn2_sum
+chn_nzl_exp_11 <- data.frame(industry = substr(colnames(icio_11_chn_cn2), 
+                                               5, nchar(colnames(icio_11_chn_cn2))), 
+                             exp_val = chn_nzl_exp_11)
+
+icio_14_chn_cn1_sum <- rowSums(icio_14_chn_cn1)
+icio_14_chn_cn2_sum <- rowSums(icio_14_chn_cn2)
+chn_nzl_exp_14 <- icio_14_chn_cn1_sum + icio_14_chn_cn2_sum
+chn_nzl_exp_14 <- data.frame(industry = substr(colnames(icio_14_chn_cn2), 
+                                               5, nchar(colnames(icio_14_chn_cn2))), 
+                             exp_val = chn_nzl_exp_14)
+
+
+# The names of the columns between 2016 datasets and 2021 datasets are differnt? Is there a way to map the names on the directory to this rather than changing it one by one?
+tradechange <- merge (chn_nzl_exp_05, chn_nzl_exp_08, by ="industry")
+colnames(tradechange)[2] <- "exp05"
+colnames(tradechange)[3] <- "exp08"
+tradechange$"change05-08" <- tradechange[,3] - tradechange[,2]
+
+tradechange <- merge (tradechange, chn_nzl_exp_05, by="industry")
+colnames(tradechange)[5] <- "exp05"
+tradechange$"change00-05" <- tradechange[,5] - tradechange [,3]
 
 tradechange <- merge (tradechange, chn_nzl_exp_07, by="industry")
-colnames(tradechange)[5] <- "exp07"
+colnames(tradechange)[7] <- "exp07"
+tradechange$"change00-07" <- tradechange[,7] - tradechange [,5]
 
-tradechange$"change00-07" <- tradechange[,5] - tradechange [,3]
-
+tradechange <- merge (tradechange, chn_nzl_exp_08, by="industry")
+colnames(trade)
 
 
