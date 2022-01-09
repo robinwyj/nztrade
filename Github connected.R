@@ -345,7 +345,36 @@ DATATSET3[24,1] <-"Water supply; sewerage, waste management and remediation acti
   DATATSET3[43,1] <-"Arts, entertainment and recreation"
   DATATSET3[44,1] <-"Other service activities"
   DATATSET3[45,1] <-"Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use"
+  DATASET3 <- DATATSET3
   
+  
+  
+#Calculating trade shock
+M_0 <- sum(DATASET3[c(7:22),2])
+M_1 <- sum(DATASET3[c(7:22),3])
+
+M_change <- sum(DATASET3[c(7:22),4])
+tradechange <- M_1 - M_0
+
+rowsum(EP06, EP06[,1])
+EP06<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
+EP06 <- EP06[1:63,]                                                                                                   
+EP06 <- EP06[,2:21]
+
+EP2006 <- EP06[,-1]
+rownames(EP2006) <- EP06[,1]
+as.numeric(EP2006)
+
+
+EP2006$"Electorate Population" <- rowSums(EP2006)
+L_i<- rowSums(EP2006)
+as.numeric (L_i)
+L_nz <- sum(EP2006$`Electorate Population`)
+L_mi <- EP2006[,3]
+as.numeric(L_mi)
+
+tradeshock <- (L_mi / L_nz)*(M_change/ L_i)
+print(tradeshock)
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
