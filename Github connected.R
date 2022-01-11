@@ -348,7 +348,6 @@ DATATSET3[24,1] <-"Water supply; sewerage, waste management and remediation acti
   DATASET3 <- DATATSET3
   
   
-  
 #Calculating trade shock
 M_0 <- sum(DATASET3[c(7:22),2])
 M_1 <- sum(DATASET3[c(7:22),3])
@@ -366,6 +365,7 @@ rownames(EP2006) <- EP06[,1]
 as.numeric(EP2006)
 
 
+
 EP2006$"Electorate Population" <- rowSums(EP2006)
 L_i<- rowSums(EP2006)
 as.numeric (L_i)
@@ -375,6 +375,23 @@ as.numeric(L_mi)
 
 tradeshock <- (L_mi / L_nz)*(M_change/ L_i)
 print(tradeshock)
+DATASET4 <- as.data.frame(tradeshock)
+DATASET4$"Electorate" <- row.names(DATASET4)
+row.names(DATASET4) <- 1:63
+as.numeric(DATASET4)
+
+DATASET4<-DATASET4[,c("Electorate","tradeshock")]
+
+
+
+#trade shock on electoral results
+df<- merge(DATASET1, DATASET4, by="Electorate")
+ plot(df$tradeshock, df$Winning.Margin.Percentage.2008.2011)
+ plot(df$tradeshock, df$Winning.Margin.Percentage.2011.2014)
+ plot(df$tradeshock, df$Winning.Margin.Percentage.2014.2017)
+
+Result1 <- lm(df$tradeshock ~ df$Winning.Margin.Percentage.2008.2011,  data = df)
+
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
