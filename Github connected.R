@@ -384,14 +384,67 @@ DATASET4<-DATASET4[,c("Electorate","tradeshock")]
 
 
 
+L_ai <- EP2006[,1]
+as.numeric(L_ai)
+M.a_change <- DATASET3[1,4] + DATASET3[2,4]
+tradeshock.a <- (L_ai / L_nz)*(M.a_change/ L_i)
+tradeshock.a <- as.data.frame(tradeshock.a)
+tradeshock.a$"Electorate" <- row.names(tradeshock.a)
+row.names(tradeshock.a) <- 1:63
+
+tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
+
+
+
+
+
+
 #trade shock on electoral results
 df<- merge(DATASET1, DATASET4, by="Electorate")
  plot(df$tradeshock, df$Winning.Margin.Percentage.2008.2011)
  plot(df$tradeshock, df$Winning.Margin.Percentage.2011.2014)
  plot(df$tradeshock, df$Winning.Margin.Percentage.2014.2017)
 
-Result1 <- lm(df$tradeshock ~ df$Winning.Margin.Percentage.2008.2011,  data = df)
+df2 <- merge(DATASET1, tradeshock.a, by="Electorate" )
+plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2008.2011)
+plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
+plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
 
+
+ 
+ 
+help(lm)
+shock1 <- lm(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
+shock2 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock, data=df)
+shock3 <- lm(Winning.Margin.Percentage.2014.2017 ~ tradeshock, data=df)
+
+shock4 <- lm(tradeshock.a ~0+ Winning.Margin.Percentage.2008.2011, data=df2)
+summary(shock4)
+shock5 <- lm(tradeshock.a ~0+ Winning.Margin.Percentage.2011.2014, data=df2)
+summary(shock5)
+
+
+shock6 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock, data=df)
+shock7 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
+
+summary(shock6)
+summary(shock7)
+plot(shock7)
+
+
+summary(shock1)
+summary(shock2)
+summary(shock3)
+plot(shock3)
+
+lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
+help("lm_robust")
+
+library(sandwich)
+library(stargazer)
+install.packages("estimatr")
+library(estimatr)
+install.packages('Rcpp') 
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
