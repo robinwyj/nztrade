@@ -383,7 +383,7 @@ as.numeric(DATASET4)
 DATASET4<-DATASET4[,c("Electorate","tradeshock")]
 
 
-
+#agricultural tradeshock
 L_ai <- EP2006[,1]
 as.numeric(L_ai)
 M.a_change <- DATASET3[1,4] + DATASET3[2,4]
@@ -399,11 +399,17 @@ tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
 
 
 
-#trade shock on electoral results
+#trade shock on electoral results, 2008-2017
 df<- merge(DATASET1, DATASET4, by="Electorate")
- plot(df$tradeshock, df$Winning.Margin.Percentage.2008.2011)
- plot(df$tradeshock, df$Winning.Margin.Percentage.2011.2014)
- plot(df$tradeshock, df$Winning.Margin.Percentage.2014.2017)
+
+ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2008.2011)) + 
+   geom_point()+geom_smooth(method='lm')
+
+ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2011.2014)) + 
+   geom_point()+geom_smooth(method='lm')
+
+ ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2014.2017)) + 
+   geom_point()+geom_smooth(method='lm')
 
 df2 <- merge(DATASET1, tradeshock.a, by="Electorate" )
 plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2008.2011)
@@ -411,40 +417,43 @@ plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
 plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
 
 
- 
- 
+#Regression with winning margin
 help(lm)
 shock1 <- lm(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
+plot(shock1)
 shock2 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock, data=df)
-shock3 <- lm(Winning.Margin.Percentage.2014.2017 ~ tradeshock, data=df)
 
-shock4 <- lm(tradeshock.a ~0+ Winning.Margin.Percentage.2008.2011, data=df2)
+#Regression with incumbent
+shock3 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
+summary(shock3)
+shock4 <- lm(Incumbent.2011.2014 ~ tradeshock, data=df)
 summary(shock4)
-shock5 <- lm(tradeshock.a ~0+ Winning.Margin.Percentage.2011.2014, data=df2)
+
+#Regresssion with agriculture
+shock4 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock.a,  data=df2)
+summary(shock4)
+shock5 <- lm(Winning.Margin.Percentage.2011.2014 ~0+ tradeshock.a, data=df2)
 summary(shock5)
 
 
-shock6 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock, data=df)
-shock7 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
 
-summary(shock6)
-summary(shock7)
-plot(shock7)
+stargazer(shock1, type = "text")
 
-
-summary(shock1)
-summary(shock2)
-summary(shock3)
-plot(shock3)
-
+#Doesnt work yet
 lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
 help("lm_robust")
 
+#installing packages
 library(sandwich)
 library(stargazer)
 install.packages("estimatr")
 library(estimatr)
 install.packages('Rcpp') 
+update.packages('Rcpp')
+update.packages('estimatr')
+install.packages("ggplot")
+
+library(ggplot2)
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
