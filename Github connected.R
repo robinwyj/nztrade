@@ -47,6 +47,21 @@ DATASET2 <- read.csv("Electorate Profile 2006")
 # Vote results for the 2008, 2011, 2014 elections
 library(readr)
 
+e02 <- read_csv("~/Downloads/e9_part6-6.csv", 
+                skip = 1)
+e05 <-  read_csv("~/Downloads/e9_part6-7.csv", 
+                 skip = 1)
+
+
+votechange0205 <- merge (vote2002, vote2005, by="Electoral District")
+
+
+colnames(votechange0205)[1] <- "Electorate"
+colnames(votechange0205)[2] <- "Electorate"
+votechange0205$incumbent <- votechange0205$Party.x == votechange0205$Party.y
+votechange0205$"Winning Margin Percentage 2002-2005" <- votechange0205[,] -votechange0205[,]
+
+
 e08 <- read_csv("~/Downloads/e9_part6-4.csv", 
                 skip = 1)
 
@@ -59,6 +74,11 @@ e14 <- read_csv("~/Downloads/e9_part6.csv",
 e17 <- read_csv("~/Downloads/winning-electorate-candidates-3.csv", 
                 skip = 1)
 
+
+e02 <- e02[,c(1,3,6)]
+colnames(e02)[1]<-"Electorate"
+e05 <- e05[,c(1,3,6)]
+colnames(e05)[1]<-"Electorate"
 e08 <- e08 [,c(1,3,6)]
 colnames(e08)[1]<-"Electorate"
 e11 <- e11 [,c(1,3,6)]
@@ -68,15 +88,31 @@ colnames(e14)[1]<-"Electorate"
 e17 <- e17 [,c(1,3,6)]
 colnames(e17)[1]<-"Electorate"
 
+
+colnames(e02)[2] <- "Party 2002"
+colnames(e05)[2] <- "Party 2005"
 colnames(e08)[2] <- "Party 2008"
 colnames(e11)[2] <- "Party 2011"
 colnames(e14)[2] <- "Party 2014"
 colnames(e17)[2] <- "Party 2017"
 
+colnames(e02)[3] <- "Percentage of Vote Recieved 2002"
+colnames(e05)[3] <- "Percentage of Vote Recieved 2005"
 colnames(e08)[3] <- "Percentage of Vote Recieved 2008"
 colnames(e11)[3] <- "Percentage of Vote Recieved 2011"
 colnames(e14)[3] <- "Percentage of Vote Recieved 2014"
 colnames(e17)[3] <- "Percentage of Vote Recieved 2017"
+
+e02$`Percentage of Vote Recieved 2002` <- gsub("%", "", e02$`Percentage of Vote Recieved 2002`)
+e02$`Percentage of Vote Recieved 2002`<- as.numeric(e02$`Percentage of Vote Recieved 2002`)
+e02[62,2] <- "Progressive Party"
+
+
+e05$`Percentage of Vote Recieved 2005` <- gsub("%", "", e05$`Percentage of Vote Recieved 2005`)
+e05$`Percentage of Vote Recieved 2005`<- as.numeric(e05$`Percentage of Vote Recieved 2005`)
+e05[62,2] <- "Progressive Party"
+e05[c(65,66,67,69),2] <- "Māori Party"
+
 
 e08$`Percentage of Vote Recieved 2008` <- gsub("%", "", e08$`Percentage of Vote Recieved 2008`)
 e08$`Percentage of Vote Recieved 2008`<- as.numeric(e08$`Percentage of Vote Recieved 2008`)
@@ -91,6 +127,14 @@ e14$`Percentage of Vote Recieved 2014`<- as.numeric(e14$`Percentage of Vote Reci
 
 e17$`Percentage of Vote Recieved 2017` <- gsub("%", "", e17$`Percentage of Vote Recieved 2017`)
 e17$`Percentage of Vote Recieved 2017`<- as.numeric(e17$`Percentage of Vote Recieved 2017`)
+
+ds1 <- merge (e02, e05, by="Electorate")
+ds1$"Incumbent 2002-2005" <- ds1$"Party 2002" == ds1$"Party 2005"
+ds1[,6] <- as.numeric (ds1[,6])
+ds1$"Winning Margin Percentage 2002-2005" <- ds1[,5]- ds1[,3]
+ds1 <- ds1[,c(1,3,5,6,7)]
+ds1$"Final Margin Percentage" <- ds1$`Incumbent 2002-2005`*ds1$`Winning Margin Percentage 2002-2005`
+
 
 dataset1 <- merge (e08,e11, by="Electorate")
 dataset1$"Incumbent 2008-2011" <- dataset1$"Party 2008" == dataset1$"Party 2011"
@@ -383,7 +427,7 @@ as.numeric(DATASET4)
 DATASET4<-DATASET4[,c("Electorate","tradeshock")]
 
 
-#agricultural tradeshock
+
 L_ai <- EP2006[,1]
 as.numeric(L_ai)
 M.a_change <- DATASET3[1,4] + DATASET3[2,4]
@@ -399,8 +443,12 @@ tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
 
 
 
-#trade shock on electoral results, 2008-2017
+#trade shock on electoral results
 df<- merge(DATASET1, DATASET4, by="Electorate")
+dfnew <- merge(ds1, DATASET4, by="Electorate")
+
+ggplot(dfnew,aes(x=tradeshock, y=Final Margin Percentage)) + 
+  geom_point()+geom_smooth(method='lm')
 
 ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2008.2011)) + 
    geom_point()+geom_smooth(method='lm')
@@ -417,19 +465,21 @@ plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
 plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
 
 
-#Regression with winning margin
+#Regression 
 help(lm)
+shocknew<- lm(dfnew[,6] ~ tradeshock, data=dfnew)
+summary(shocknew)
+
+
 shock1 <- lm(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
 plot(shock1)
 shock2 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock, data=df)
 
-#Regression with incumbent
 shock3 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
 summary(shock3)
 shock4 <- lm(Incumbent.2011.2014 ~ tradeshock, data=df)
 summary(shock4)
 
-#Regresssion with agriculture
 shock4 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock.a,  data=df2)
 summary(shock4)
 shock5 <- lm(Winning.Margin.Percentage.2011.2014 ~0+ tradeshock.a, data=df2)
@@ -439,9 +489,43 @@ summary(shock5)
 
 stargazer(shock1, type = "text")
 
-#Doesnt work yet
+
 lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
 help("lm_robust")
+
+#mapping
+install.packages("sf")
+install.packages("raster")
+install.packages("tmap")
+install.packages("tmap")
+
+library(sf)
+library(raster)
+library(dplyr)
+library(spData)
+library(spDataLarge)
+
+library(tmap)
+library(tmaptools)
+library(leaflet)
+library(ggplot2)
+
+library(readr)
+
+options(scipen=999)
+
+
+
+map_and_data <- inner_join(tradeshock.a, map)
+
+map <- st_read("~/Desktop/general-electoral-district-2002.csv")
+colnames(map)[3] <- "Electorate"
+ggplot(map_and_data )+
+  geom_sf(aes(fill= tradeshock.a))
+rlang::last_error()
+
+ggplot(general_electoral_district_2002) +
+  geo_sf(aes(fill= "SHAPE"))
 
 #installing packages
 library(sandwich)
@@ -449,8 +533,6 @@ library(stargazer)
 install.packages("estimatr")
 library(estimatr)
 install.packages('Rcpp') 
-update.packages('Rcpp')
-update.packages('estimatr')
 install.packages("ggplot")
 
 library(ggplot2)
@@ -459,6 +541,7 @@ library(ggplot2)
  library(readr)
  winning_electorate_candidates <- read_csv("~/Downloads/winning-electorate-candidates.csv", 
                                            skip = 1)
+ 
  vote2020<-(winning_electorate_candidates)
  
  vote2020<- vote2020[,c(1,3)]
