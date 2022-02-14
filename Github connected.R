@@ -1,3 +1,38 @@
+#installing packages
+install.packages("estimatr")
+install.packages('Rcpp') 
+install.packages("ggplot")
+install.packages("sf")
+install.packages("raster")
+install.packages("dplyr")
+install.packages("spData")
+install.packages('spDataLarge', repos='https://nowosad.github.io/drat/',
+                 type='source')
+install.packages("tmap")
+install.packages("cartography")
+install.packages("tidyverse")
+
+
+#pacakges used
+library(readr)
+library(sandwich)
+library(stargazer)
+library(estimatr)
+library(sf)
+library(raster)
+library(dplyr)
+library(spData)
+library(spDataLarge)
+
+library(tmap)
+library(tmaptools)
+library(leaflet)
+library(ggplot2)
+library(cartography)
+library(tidyverse)
+
+
+
 #Electorate Profile for yeras 2006, 2013,2018
 EP06<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
  EP06 <- EP06[1:63,]                                                                                                   
@@ -167,7 +202,7 @@ colnames(DATASET1)[1] <- "Electorate"
 library(readr)
 
 icio_95 <- read.csv("ICIO2016_1995.csv")
-icio_00 <- read.csv("~/Documents/ICIO2016_2000.csv")
+icio_00 <- read.csv("~/Desktop/ICIO2016_2000.csv")
 
 icio_05 <- read.csv("~/Desktop/ICIO2021_2005.csv")
 icio_07 <- read.csv("~/Desktop/ICIO2021_2007.csv")
@@ -426,6 +461,12 @@ as.numeric(DATASET4)
 
 DATASET4<-DATASET4[,c("Electorate","tradeshock")]
 
+tradeshock <- as.data.frame(tradeshock)
+tradeshock$"Electorate" <- row.names(tradeshock)
+row.names(tradeshock) <- 1:63
+
+tradeshock<-tradeshock[,c("Electorate","tradeshock")]
+
 
 
 L_ai <- EP2006[,1]
@@ -494,48 +535,53 @@ lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
 help("lm_robust")
 
 #mapping
-install.packages("sf")
-install.packages("raster")
-install.packages("tmap")
-install.packages("tmap")
 
-library(sf)
-library(raster)
-library(dplyr)
-library(spData)
-library(spDataLarge)
+map <- st_read("D:/Louis/IR project/general-electoral-district-2002.csv")
+map2007 <- st_read("D:/Louis/IR project/general-electoral-district-2007.csv")
+map2014 <- st_read("D:/Louis/IR project/general-electoral-district-2014.csv")
 
-library(tmap)
-library(tmaptools)
-library(leaflet)
-library(ggplot2)
-
-library(readr)
-
-options(scipen=999)
-
-
+colnames(map)[2] <- "Electorate"
+colnames(map2007)[2] <- "Electorate"
+colnames(map2014)[2] <- "Electorate"
 
 map_and_data <- inner_join(tradeshock.a, map)
+tradeshockmap2007 <- inner_join(tradeshock, map2007)
+tradeshockmap2014 <- inner_join(tradeshock, map2014)
 
-map <- st_read("~/Desktop/general-electoral-district-2002.csv")
-colnames(map)[3] <- "Electorate"
+
+map_and_data = st_as_sf(map_and_data)
+tm_shape(map_and_data)+
+  tm_polygons("tradeshock.a",id="Electorate")
+
+tradeshockmap = st_as_sf(tradeshockmap)
+tm_shape(tradeshockmap)+
+  tm_polygons("tradeshock",id="Electorate")
+
+tradeshockmap2007 = st_as_sf(tradeshockmap2007)
+tm_shape(tradeshockmap2007)+
+  tm_polygons("tradeshock",id="Electorate")
+
+tradeshockmap2014 = st_as_sf(tradeshockmap2014)
+tm_shape(tradeshockmap2014)+
+  tm_polygons("tradeshock",id="Electorate")
+
+#trials
+map_and_data$geometry <- "MULTIPOLYGON"
+
+plot(st_geometry(map))
+choroLayer(x=map_and_data, var="tradeshock.a", method="equal")
+
+
+
 ggplot(map_and_data )+
-  geom_sf(aes(fill= tradeshock.a))
-rlang::last_error()
+  geom_sf(aes(fill="tradeshock.a"))
+  rlang::last_error()
 
 ggplot(general_electoral_district_2002) +
   geo_sf(aes(fill= "SHAPE"))
 
-#installing packages
-library(sandwich)
-library(stargazer)
-install.packages("estimatr")
-library(estimatr)
-install.packages('Rcpp') 
-install.packages("ggplot")
 
-library(ggplot2)
+
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
