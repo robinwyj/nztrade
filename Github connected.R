@@ -209,6 +209,8 @@ icio_07 <- read.csv("~/Desktop/ICIO2021_2007.csv")
 icio_08 <- read.csv("~/Desktop/ICIO2021_2008.csv")
 icio_11 <- read.csv("~/Desktop/ICIO2021_2011.csv")
 icio_14 <- read.csv("~/Desktop/ICIO2021_2014.csv")
+icio_17 <- read.csv("ICIO2021_2017.csv")
+
 
 
 
@@ -276,6 +278,14 @@ icio_14_chn_cn1 <- icio_14_chn_cn1[,1:45]
 icio_14_chn_cn2 <- icio_14_chn_cn2[,1:45]
 
 
+icio_17_chn_cn1 <- data.frame(icio_17[substr(icio_17$X, 1, 3) %in% c ("CN1"), 
+                                      substr(colnames(icio_17), 1, 3) == "NZL"])
+
+icio_17_chn_cn2 <- data.frame(icio_17[substr(icio_17$X, 1, 3) %in% c ("CN2"), 
+                                      substr(colnames(icio_17), 1, 3) == "NZL"])
+
+icio_17_chn_cn1 <- icio_17_chn_cn1[,1:45]
+icio_17_chn_cn2 <- icio_17_chn_cn2[,1:45]
 
 
 icio_95_chn_cn2 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN2"), 
@@ -352,6 +362,14 @@ chn_nzl_exp_14 <- data.frame(industry = substr(colnames(icio_14_chn_cn2),
                              exp_val = chn_nzl_exp_14)
 write.csv(chn_nzl_exp_14, "trade 2014.csv", row.names=FALSE)
 
+icio_17_chn_cn1_sum <- rowSums(icio_17_chn_cn1)
+icio_17_chn_cn2_sum <- rowSums(icio_17_chn_cn2)
+chn_nzl_exp_17 <- icio_17_chn_cn1_sum + icio_17_chn_cn2_sum
+chn_nzl_exp_17 <- data.frame(industry = substr(colnames(icio_17_chn_cn2), 
+                                               5, nchar(colnames(icio_17_chn_cn2))), 
+                             exp_val = chn_nzl_exp_17)
+write.csv(chn_nzl_exp_17, "trade 2017.csv", row.names=FALSE)
+
 
 
 #Trade
@@ -360,6 +378,8 @@ chn_nzl_exp_08 <-read.csv("trade 2008.csv")
 chn_nzl_exp_07 <-read.csv("trade 2007.csv")
 chn_nzl_exp_11 <-read.csv("trade 2011.csv")
 chn_nzl_exp_14 <-read.csv("trade 2014.csv")
+chn_nzl_exp_17 <-read.csv("trade 2017.csv")
+
 
 
 
@@ -375,6 +395,10 @@ tradechange$"change08-11" <- tradechange[,5] - tradechange [,3]
 tradechange <- merge (tradechange, chn_nzl_exp_14, by="industry")
 colnames(tradechange)[7] <- "exp14"
 tradechange$"change11-14" <- tradechange[,7] - tradechange [,5]
+
+tradechange <- merge (tradechange, chn_nzl_exp_17, by="industry")
+colnames(tradechange)[9] <- "exp17"
+tradechange$"change14-17" <- tradechange[,9] - tradechange [,7]
 
 write.csv(tradechange, "trade data.csv", row.names = FALSE)
 DATATSET3 <- read.csv ("trade data.csv")
@@ -452,6 +476,13 @@ L_nz <- sum(EP2006$`Electorate Population`)
 L_mi <- EP2006[,3]
 as.numeric(L_mi)
 
+tradeshock2005 <- (L_mi/L_nz)*(M_0/L_i)
+trade2005 <- as.data.frame(tradeshock2005)
+trade2005$"Electorate" <- row.names(trade2005)
+row.names(trade2005) <- 1:63
+trade2005<-trade2005[,c("Electorate","tradeshock2005")]
+
+
 tradeshock <- (L_mi / L_nz)*(M_change/ L_i)
 print(tradeshock)
 DATASET4 <- as.data.frame(tradeshock)
@@ -478,7 +509,6 @@ tradeshock.a$"Electorate" <- row.names(tradeshock.a)
 row.names(tradeshock.a) <- 1:63
 
 tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
-
 
 
 
@@ -543,10 +573,10 @@ map2014 <- st_read("D:/Louis/IR project/general-electoral-district-2014.csv")
 colnames(map)[2] <- "Electorate"
 colnames(map2007)[2] <- "Electorate"
 colnames(map2014)[2] <- "Electorate"
+map2014[26,2]<-	"Rangitikei"
 
 map_and_data <- inner_join(tradeshock.a, map)
-tradeshockmap2007 <- inner_join(tradeshock, map2007)
-tradeshockmap2014 <- inner_join(tradeshock, map2014)
+tradeshockmap2005 <- inner_join(trade2005, map)
 
 
 map_and_data = st_as_sf(map_and_data)
@@ -557,9 +587,14 @@ tradeshockmap = st_as_sf(tradeshockmap)
 tm_shape(tradeshockmap)+
   tm_polygons("tradeshock",id="Electorate")
 
-tradeshockmap2007 = st_as_sf(tradeshockmap2007)
-tm_shape(tradeshockmap2007)+
-  tm_polygons("tradeshock",id="Electorate")
+tradeshockmap2005 = st_as_sf(tradeshockmap2005)
+tm_shape(tradeshockmap2005)+
+  tm_polygons("tradeshock2005",id="Electorate")
+
+
+trade2005$Electorate==map$Electorate
+
+
 
 tradeshockmap2014 = st_as_sf(tradeshockmap2014)
 tm_shape(tradeshockmap2014)+
@@ -582,6 +617,63 @@ ggplot(general_electoral_district_2002) +
 
 
 
+#Tradeshock and voting for 2011-2014 using the 2013 census, using 2011 as t0
+M_0 <- sum(DATASET3[c(7:22),7])
+EP13 <- read.csv("ep17.csv")
+EP13 <- EP13[,2:ncol(EP13)]
+
+rownames(EP13) <- EP13[,1]
+EP13<- EP13[,-1]
+EP13$"Electorate Population" <- rowSums(EP13)
+
+L_i<- rowSums(EP13)
+as.numeric (L_i)
+L_nz <- sum(EP13$`Electorate Population`)
+L_mi <- EP13[,3]
+as.numeric(L_mi)
+
+tradeshock2011 <- (L_mi/L_nz)*(M_0/L_i)
+trade2011 <- as.data.frame(tradeshock2011)
+trade2011$"Electorate" <- row.names(trade2011)
+row.names(trade2011) <- 1:64
+trade2011<-trade2011[,c("Electorate","tradeshock2011")]
+
+
+
+tradeshockmap2011 <- inner_join(trade2011, map2014)
+tradeshockmap2011 = st_as_sf(tradeshockmap2011)
+tm_shape(tradeshockmap2011)+
+  tm_polygons("tradeshock2011",id="Electorate")
+
+                           
+
+
+
+                     
+#Looking at the 2014 election
+M_change <- sum(DATASET3[c(7:22),8])
+
+tradeshock2014 <- (L_mi/L_nz)*(M_change/L_i)
+trade2014 <- as.data.frame(tradeshock2014)
+trade2014$"Electorate" <- row.names(trade2014)
+row.names(trade2014) <- 1:64
+trade2014<-trade2014[,c("Electorate","tradeshock2014")]
+
+
+
+tradeshockmap2014 <- inner_join(trade2014, map2014)
+tradeshockmap2014 = st_as_sf(tradeshockmap2014)
+tm_shape(tradeshockmap2014)+
+  tm_polygons("tradeshock2014",id="Electorate")
+
+
+
+#Regression
+df1114<- merge(DATASET1, trade2014, by="Electorate")
+shock1114 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock2014, data=df1114)
+summary(df1114)
+df1114robust<-lm_robust(Winning.Margin.Percentage.2011.2014 ~ tradeshock2014, data=df1114)
+summary(df1114robust)
 
  # Obsolete Below are codes comiling data and writing csv.
  library(readr)
