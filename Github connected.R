@@ -20,6 +20,7 @@ install.packages("sandwich")
 
 #pacakges used
 library(readr)
+library(readxl)
 library(sandwich)
 library(stargazer)
 library(estimatr)
@@ -129,7 +130,38 @@ DATASET1 <- Election
 
 
 
+#Party Vote data
+Partyvote_2011 <- read_csv("Election 2011.csv", 
+                          skip = 1)
+colnames(Partyvote_2011)[1]<- "Electorate"
+Partyvote_2011<- Partyvote_2011[,c(1,3,5,7,9,11,13,15,17)]
+Partyvote_2011 <- Partyvote_2011[-1,]
+Partyvote_2011 <- Partyvote_2011[1:63,]
+Electname11 <- Partyvote_2011$Electorate
+Partyvote_2011 <- as.data.frame(apply(Partyvote_2011, 2, as.numeric))
+Partyvote_2011$Electorate<- Electname11
+colnames(Partyvote_2011) <- paste0("2011",colnames(Partyvote_2011))
+colnames(Partyvote_2011)[1]<- "Electorate"
 
+Partyvote_2011$`2011MANA`<- NULL
+
+Partyvote_2014 <- read_csv("Election 2014.csv", 
+                           skip = 1)
+colnames(Partyvote_2014)[1]<- "Electorate"
+Partyvote_2014<- Partyvote_2014[,c(1,3,5,7,9,11,13,15)]
+Partyvote_2014 <- Partyvote_2014[-1,]
+Partyvote_2014 <- Partyvote_2014[1:63,]
+Electname14 <- Partyvote_2014$Electorate
+Partyvote_2014 <- as.data.frame(apply(Partyvote_2014, 2, as.numeric))
+Partyvote_2014$Electorate<- Electname14
+colnames(Partyvote_2014) <- paste0("2014",colnames(Partyvote_2014))
+colnames(Partyvote_2014)[1]<- "Electorate"
+
+Partyvote1114 <- merge(Partyvote_2011, Partyvote_2014, "Electorate")
+Partyvote1114 <- for (i in 2:15) {
+  Partyvote1114[,i] <- Partyvote1114[,i+7]- Partyvote1114[,i]
+}
+Partyvote1114<- Partyvote1114[,1:8]
 
 # Relevant trade data 1995-2014
 library(readr)
@@ -447,55 +479,6 @@ tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
 
 
 
-#trade shock on electoral results
-df<- merge(DATASET1, DATASET4, by="Electorate")
-dfnew <- merge(ds1, DATASET4, by="Electorate")
-
-ggplot(dfnew,aes(x=tradeshock, y=Final Margin Percentage)) + 
-  geom_point()+geom_smooth(method='lm')
-
-ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2008.2011)) + 
-   geom_point()+geom_smooth(method='lm')
-
-ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2011.2014)) + 
-   geom_point()+geom_smooth(method='lm')
-
- ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2014.2017)) + 
-   geom_point()+geom_smooth(method='lm')
-
-df2 <- merge(DATASET1, tradeshock.a, by="Electorate" )
-plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2008.2011)
-plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
-plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
-
-
-#Regression 
-help(lm)
-shocknew<- lm(dfnew[,6] ~ tradeshock, data=dfnew)
-summary(shocknew)
-
-
-shock1 <- lm(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
-plot(shock1)
-shock2 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock, data=df)
-
-shock3 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
-summary(shock3)
-shock4 <- lm(Incumbent.2011.2014 ~ tradeshock, data=df)
-summary(shock4)
-
-shock4 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock.a,  data=df2)
-summary(shock4)
-shock5 <- lm(Winning.Margin.Percentage.2011.2014 ~0+ tradeshock.a, data=df2)
-summary(shock5)
-
-
-
-stargazer(shock1, type = "text")
-
-
-lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
-help("lm_robust")
 
 #mapping
 
@@ -611,10 +594,60 @@ summary(df1114robust)
 (Covar1114 <- vcovHC(shock1114))
 (Estvar1114 <- diag(result1114))
 
-stargazer(shock1114,
+ stargazer(shock1114,
           se = list(sqrt(Estvar1114)),
-          type = "text")
+          type = "text",
+          header = FALSE)
+ 
+ #Adding Control Variables
+ #Percentage of rural population
+ EP13 <- read.csv("ep17.csv")
+ EP13 <- EP13[,2:ncol(EP13)]
+ EP13<-EP13[,1:19]
+ colnames(EP13) <- paste0("2013",colnames(EP13))
+ colnames(EP13)[1] <- "Electorate"
+ EP13$"Electorate Population" <- rowSums(EP13[,c(2:19)])
+ 
+ EP13$"RuralPopulation" <- EP13$`2013A.Agriculture..Forestry.and.Fishing`/EP13$`Electorate Population`
+ Ruralpop <- EP13[,c(1,21)]
+ df1114agri <- merge (Ruralpop, df1114, by = "Electorate")
+ shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + RuralPopulation + tradeshock2014*RuralPopulation, data=df1114agri)
+ summary (shock1114)
+ 
+ 
+ #Testing for unemployment benefits and education
+ EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                                                  sheet = "22", skip = 2)
+EP13education <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                            sheet = "7", skip = 1)
+EP13education$"Tertiaryedu" <- rowSums(EP13education[,10:13])
+EP13education$"Tertiaryedu"<- EP13education$Tertiaryedu/EP13education$Total
+df1114edu <- merge (EP13education, df1114, by = "Electorate")
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu, data=df1114edu)
+summary(shock1114)
+ 
+df1114agriedu <- merge (df1114agri, EP13education, by="Electorate")
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu + df1114agriedu$RuralPopulation
+                + tradeshock2014*Tertiaryedu + tradeshock2014*EP13$RuralPopulation, data=df1114agriedu)
+summary(shock1114)
 
+
+#Testing unemployment compensation
+EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                           sheet = "22", skip = 2)
+EP13unemploy <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                           sheet = "23", skip = 2)
+EP13benefits <- EP13benefits[1:64,c(1,3)]
+EP13unemploy <- EP13unemploy[1:64, c(1,4)]
+Compensation <- merge (EP13benefits, EP13unemploy, by="Electorate")
+colnames(Compensation)[3] <- "Unemployed"
+Compensation$Compensated <- as.numeric(Compensation$`Unemployment benefit`)/as.numeric(Compensation$`Unemployed`)
+df1114Comp <- merge (df1114, Compensation, by= "Electorate")
+
+
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Compensated
+            , data=df1114Comp)
+summary(shock1114)
 
 
  # Obsolete Below are codes comiling data and writing csv.
@@ -845,6 +878,59 @@ stargazer(shock1114,
  colnames(DATASET1)[1] <- "Electorate"
  
  
+ #trade shock on electoral results (NOW OBSOLETE)
+ df<- merge(DATASET1, DATASET4, by="Electorate")
+ dfnew <- merge(ds1, DATASET4, by="Electorate")
+ 
+ ggplot(dfnew,aes(x=tradeshock, y=Final Margin Percentage)) + 
+   geom_point()+geom_smooth(method='lm')
+ 
+ ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2008.2011)) + 
+   geom_point()+geom_smooth(method='lm')
+ 
+ ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2011.2014)) + 
+   geom_point()+geom_smooth(method='lm')
+ 
+ ggplot(df,aes(x=tradeshock, y=Winning.Margin.Percentage.2014.2017)) + 
+   geom_point()+geom_smooth(method='lm')
+ 
+ df2 <- merge(DATASET1, tradeshock.a, by="Electorate" )
+ plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2008.2011)
+ plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
+ plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
+ 
+ 
+
+ 
+ 
+ 
+ #Regression (NOW OBSOLETE)
+ help(lm)
+ shocknew<- lm(dfnew[,6] ~ tradeshock, data=dfnew)
+ summary(shocknew)
+ 
+ 
+ shock1 <- lm(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
+ plot(shock1)
+ shock2 <- lm(Winning.Margin.Percentage.2011.2014 ~ tradeshock, data=df)
+ 
+ shock3 <- lm(Incumbent.2008.2011 ~ tradeshock, data=df)
+ summary(shock3)
+ shock4 <- lm(Incumbent.2011.2014 ~ tradeshock, data=df)
+ summary(shock4)
+ 
+ shock4 <- lm(Winning.Margin.Percentage.2008.2011 ~0+ tradeshock.a,  data=df2)
+ summary(shock4)
+ shock5 <- lm(Winning.Margin.Percentage.2011.2014 ~0+ tradeshock.a, data=df2)
+ summary(shock5)
+ 
+ 
+ 
+ stargazer(shock1, type = "text")
+ 
+ 
+ lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
+ help("lm_robust")
  
  
  
