@@ -44,29 +44,16 @@ library(matrixStats)
 EP06<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
  EP06 <- EP06[1:63,]                                                                                                   
  EP06 <- EP06[,2:20]
- 
- EP06 <- for (i in 2:20) {
-   EP06[,i] <- as.numeric(EP06[,i])
-   EP06[,i] <-  EP06[,i]/ sum( EP06[,i])
- }
+ rownames(EP06) <- EP06[,1]
+ EP06<-EP06[,-1]
  colnames(EP06) <- paste0("2006",colnames(EP06))
- colnames(EP06)[1] <- "Electorate"
- 
- EP13 <- read.csv("ep17.csv")
- EP13 <- EP13[,2:ncol(EP13)]
-
- as.numeric(EP13[,2])
-  EP13[,2]/ sum( EP13[,2])
- 
- EP13 <- for (i in 2:21) {
-    EP13[,i] <- as.numeric(EP13[,i])
-    EP13[,i] <-  EP13[,i]/ sum( EP13[,i])
- }
- 
- EP13<-EP13[,1:19]
- colnames(EP13) <- paste0("2013",colnames(EP13))
- colnames(EP13)[1] <- "Electorate"
- 
+  
+  EP13 <- read.csv("ep17.csv")
+  EP13 <- EP13[,2:ncol(EP13)]
+  rownames(EP13) <- EP13[,1]
+  EP13<- EP13[,-1]
+  colnames(EP13) <- paste0("2013",colnames(EP13))
+  
 
  EP18<-read.csv("ep20.csv")
  EP18 <- EP18[c(2:66),]
@@ -83,7 +70,6 @@ colnames(EP18)[1] <- "Electorate"
 write.csv(EP06, "Electorate Profile 2006",row.names=FALSE)
 DATASET2 <- read.csv("Electorate Profile 2006")
  
-
 
 
 
@@ -113,21 +99,15 @@ Election_2014<- Election_2014[1:64,]
 Electoratenames14 <- Election_2014$Electorate
 Election_2014 <- as.data.frame(apply(Election_2014, 2, as.numeric))
 Election_2014$max <- apply(Election_2014[,2:8], 1, max)
-Election_2014$Electorate<- Electoratenames
+Election_2014$Electorate<- Electoratenames14
 
 Election_2014$"Party Succeded" <- colnames(Election_2014)[apply(Election_2014,1,which.max)]
 colnames(Election_2014) <- paste0("2014",colnames(Election_2014))
 colnames(Election_2014)[1]<- "Electorate"
 
-
 Election <- merge(Election_2011,Election_2014, by="Electorate")
 Election$"Winning Margin 2011-2014" <- Election$`2014max`- Election$`2011max`
 Election$Incumbency <- Election$`2011Party Succeded`== Election$`2014Party Succeded`
-
-
-Election[28,22] <- Election[28,16]- Election[28,7]
-DATASET1 <- Election
-
 
 
 #Party Vote data
@@ -163,29 +143,391 @@ Partyvote1114 <- for (i in 2:15) {
 }
 Partyvote1114<- Partyvote1114[,1:8]
 
-# Relevant trade data 1995-2014
+
+# Relevant trade data 1995-2014, only 2011, 2014 AND DATA 3 needed for now
 library(readr)
-
-icio_95 <- read.csv("ICIO2016_1995.csv")
-icio_00 <- read.csv("~/Desktop/ICIO2016_2000.csv")
-
-icio_05 <- read.csv("~/Desktop/ICIO2021_2005.csv")
-icio_07 <- read.csv("~/Desktop/ICIO2021_2007.csv")
-icio_08 <- read.csv("~/Desktop/ICIO2021_2008.csv")
-icio_11 <- read.csv("~/Desktop/ICIO2021_2011.csv")
-icio_14 <- read.csv("~/Desktop/ICIO2021_2014.csv")
-icio_17 <- read.csv("ICIO2021_2017.csv")
+#icio_95 <- read.csv("ICIO2016_1995.csv")
+#icio_05 <- read.csv("ICIO2021_2005.csv")
+#icio_07 <- read.csv("ICIO2021_2007.csv")
+#icio_08 <- read.csv("ICIO2021_2008.csv")
+icio_11 <- read.csv("ICIO2021_2011.csv")
+icio_14 <- read.csv("ICIO2021_2014.csv")
+DATASET3 <- read.csv ("DATASET3")
 
 
 
+#Tradeshock and voting for 2011-2014 using the 2013 census, using 2011 as t0
+M_change <- sum(DATASET3[c(7:22), 8])
+
+L_i<- rowSums(EP13)
+as.numeric (L_i)
+L_nz <- sum(EP13$`Electorate Population`)
+L_mi <- EP13$C.Manufacturing
+as.numeric(L_mi)
+
+tradeshock2011 <- (L_mi/L_nz)*(M_0/L_i)
+trade2011 <- as.data.frame(tradeshock2011)
+trade2011$"Electorate" <- row.names(trade2011)
+row.names(trade2011) <- 1:64
+trade2011<-trade2011[,c("Electorate","tradeshock2011")]
 
 
-# optional?
-all_cty <- unique(substr(colnames(icio_07), 1, 3))[-1]
-all_cty <- all_cty[-c(72:length(all_cty))]
-all_cty <- all_cty[!all_cty== "NZL"]
-#
+                           
+# Testing for NZ agircultural export in offsetting manufacturing tradeshock
+icio_11 <- read.csv("ICIO2021_2011.csv")
+icio_14 <- read.csv("ICIO2021_2014.csv")
 
+icio_11_chn_cn1 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_11), 1, 3) == "CN1"])
+
+icio_11_chn_cn2 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_11), 1, 3) == "CN2"])
+icio_11_chn_cn1 <- icio_11_chn_cn1[1:45,]
+icio_11_chn_cn2 <- icio_11_chn_cn2[1:45,]
+icio_11_chn_cn1_sum <- rowSums(icio_11_chn_cn1)
+icio_11_chn_cn2_sum <- rowSums(icio_11_chn_cn2)
+chn_nzl_exp_11 <- icio_11_chn_cn1_sum + icio_11_chn_cn2_sum
+nzl_chn_exp_11 <- data.frame(industry = substr(colnames(icio_11_chn_cn2), 
+                                               5, nchar(colnames(icio_11_chn_cn2))), 
+                             exp_val = chn_nzl_exp_11)
+
+
+icio_14_chn_cn1 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_14), 1, 3) == "CN1"])
+
+icio_14_chn_cn2 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_14), 1, 3) == "CN2"])
+icio_14_chn_cn1 <- icio_14_chn_cn1[1:45,]
+icio_14_chn_cn2 <- icio_14_chn_cn2[1:45,]
+icio_14_chn_cn1_sum <- rowSums(icio_14_chn_cn1)
+icio_14_chn_cn2_sum <- rowSums(icio_14_chn_cn2)
+chn_nzl_exp_14 <- icio_14_chn_cn1_sum + icio_14_chn_cn2_sum
+nzl_chn_exp_14 <- data.frame(industry = substr(colnames(icio_14_chn_cn2), 
+                                               5, nchar(colnames(icio_14_chn_cn2))), 
+                             exp_val = chn_nzl_exp_14)
+
+L_i<- rowSums(EP13)
+as.numeric (L_i)
+L_nz <- sum(EP13$`Electorate Population`)
+L_ai <- EP13[,1]
+as.numeric(L_ai)
+Ma_0 <- sum(nzl_chn_exp_11[c(1,2,8),2]) 
+Ma_1 <- sum(nzl_chn_exp_14 [c(1,2,8),2]) 
+Ma_change <- Ma_1 - Ma_0
+
+
+countertradeshock2011 <- (L_ai/L_nz)*(Ma_change/L_i)
+countertrade2011 <- as.data.frame(countertradeshock2011)
+countertrade2011$"Electorate" <- row.names(countertrade2011)
+row.names(countertrade2011) <- 1:64
+countertrade2011<- countertrade2011[,c("Electorate","countertradeshock2011")]
+df1114agriexp <- merge(df1114, countertrade2011, by ="Electorate")
+
+#Testing for effect of agricultural export, nz to china
+ABC<- lm_robust( ~ trade2011$tradeshock2011)
+summary(ABC)
+
+
+
+                     
+#Looking at the 2014 election
+M_change <- sum(DATASET3[c(7:22),8])
+
+tradeshock2014 <- (L_mi/L_nz)*(M_change/L_i)
+trade2014 <- as.data.frame(tradeshock2014)
+trade2014$"Electorate" <- row.names(trade2014)
+row.names(trade2014) <- 1:64
+trade2014<-trade2014[,c("Electorate","tradeshock2014")]
+
+
+
+tradeshockmap2014 <- inner_join(trade2014, map2014)
+tradeshockmap2014 = st_as_sf(tradeshockmap2014)
+tm_shape(tradeshockmap2014)+
+  tm_polygons("tradeshock2014",id="Electorate")
+
+
+
+#Regression
+df1114<- merge(DATASET1, trade2014, by="Electorate")
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014, data=df1114)
+summary(shock1114)
+df1114robust<-lm_robust(df1114$`Winning Margin 2011-2014` ~ tradeshock2014, data=df1114)
+summary(df1114robust)
+
+(Covar1114 <- vcovHC(shock1114))
+(Estvar1114 <- diag(result1114))
+
+ stargazer(shock1114,
+          se = list(sqrt(Estvar1114)),
+          type = "text",
+          header = FALSE)
+ 
+ #Adding Control Variables
+ #Percentage of rural population
+ EP13 <- read.csv("ep17.csv")
+ EP13 <- EP13[,2:ncol(EP13)]
+ EP13<-EP13[,1:19]
+ colnames(EP13) <- paste0("2013",colnames(EP13))
+ colnames(EP13)[1] <- "Electorate"
+ EP13$"Electorate Population" <- rowSums(EP13[,c(2:19)])
+ 
+ EP13$"RuralPopulation" <- EP13$`2013A.Agriculture..Forestry.and.Fishing`/EP13$`Electorate Population`
+ Ruralpop <- EP13[,c(1,21)]
+ df1114agri <- merge (Ruralpop, df1114, by = "Electorate")
+ shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + RuralPopulation + tradeshock2014*RuralPopulation, data=df1114agri)
+ summary (shock1114)
+ 
+ 
+ #Testing for unemployment benefits and education
+ EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                                                  sheet = "22", skip = 2)
+EP13education <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                            sheet = "7", skip = 1)
+EP13education$"Tertiaryedu" <- rowSums(EP13education[,10:13])
+EP13education$"Tertiaryedu"<- EP13education$Tertiaryedu/EP13education$Total
+df1114edu <- merge (EP13education, df1114, by = "Electorate")
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu, data=df1114edu)
+summary(shock1114)
+ 
+df1114agriedu <- merge (df1114agri, EP13education, by="Electorate")
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu + df1114agriedu$RuralPopulation
+                + tradeshock2014*Tertiaryedu + tradeshock2014*EP13$RuralPopulation, data=df1114agriedu)
+summary(shock1114)
+
+
+#Testing unemployment compensation
+EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                           sheet = "22", skip = 2)
+EP13unemploy <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                           sheet = "23", skip = 2)
+EP13benefits <- EP13benefits[1:64,c(1,3)]
+EP13unemploy <- EP13unemploy[1:64, c(1,4)]
+Compensation <- merge (EP13benefits, EP13unemploy, by="Electorate")
+colnames(Compensation)[3] <- "Unemployed"
+Compensation$Compensated <- as.numeric(Compensation$`Unemployment benefit`)/as.numeric(Compensation$`Unemployed`)
+df1114Comp <- merge (df1114, Compensation, by= "Electorate")
+
+
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Compensated
+            , data=df1114Comp)
+summary(shock1114)
+
+
+#Testing level of personal income
+EP13income <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
+                         sheet = "21", skip = 2)
+EP13income <- EP13income[1:64,]
+EP13income$"LowIncome" <- rowSums(EP13[,c(2:5)])/as.numeric(EP13income$`Total Stated`)
+EP13income$"LowerMiddleIncome" <- rowSums(EP13[,c(6:9)])/as.numeric(EP13income$`Total Stated`)
+EP13income$"MiddleIncome" <- rowSums(EP13[,c(10:13)])/as.numeric(EP13income$`Total Stated`)
+EP13income$"HighIncome" <- rowSums(EP13[,c(14:16)])/as.numeric(EP13income$`Total Stated`)
+df1114income <- merge (df1114, EP13income, by= "Electorate")
+
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + LowIncome
+                , data=df1114income)
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + LowerMiddleIncome
+                , data=df1114income)
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + MiddleIncome
+                , data=df1114income)
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + HighIncome
+                , data=df1114income)
+summary(shock1114)
+
+
+shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ df1114$tradeshock2014 + df1114agri$RuralPopulation 
+                + df1114Comp$Compensated + df1114edu$Tertiaryedu +df1114income$LowIncome + df1114income$LowerMiddleIncome + df1114agriexp$countertradeshock2011
+                + df1114agri$RuralPopulation*df1114$tradeshock2014)
+summary(shock1114)
+
+
+#Instrumental variable by using Chinese trade to U.S.
+us_icio_11_chn_cn1 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("USA"), 
+                                         substr(colnames(icio_11), 1, 3) == "CN1"])
+
+us_icio_11_chn_cn2 <- data.frame(icio_11[substr(icio_11$X, 1, 3) %in% c ("USA"), 
+                                         substr(colnames(icio_11), 1, 3) == "CN2"])
+us_icio_11_chn_cn1_sum <- rowSums(us_icio_11_chn_cn1)
+us_icio_11_chn_cn2_sum <- rowSums(us_icio_11_chn_cn2)
+us_chn_exp_11 <- us_icio_11_chn_cn1_sum + us_icio_11_chn_cn2_sum
+us_chn_exp_11 <- data.frame(industry = substr(colnames(us_icio_11_chn_cn2), 
+                                              5, nchar(colnames(us_icio_11_chn_cn2))), 
+                            exp_val = us_chn_exp_11)
+
+
+icio_14_chn_cn1 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_14), 1, 3) == "CN1"])
+
+icio_14_chn_cn2 <- data.frame(icio_14[substr(icio_14$X, 1, 3) %in% c ("NZL"), 
+                                      substr(colnames(icio_14), 1, 3) == "CN2"])
+icio_14_chn_cn1 <- icio_14_chn_cn1[1:45,]
+icio_14_chn_cn2 <- icio_14_chn_cn2[1:45,]
+icio_14_chn_cn1_sum <- rowSums(icio_14_chn_cn1)
+icio_14_chn_cn2_sum <- rowSums(icio_14_chn_cn2)
+chn_nzl_exp_14 <- icio_14_chn_cn1_sum + icio_14_chn_cn2_sum
+nzl_chn_exp_14 <- data.frame(industry = substr(colnames(icio_14_chn_cn2), 
+                                               5, nchar(colnames(icio_14_chn_cn2))), 
+                             exp_val = chn_nzl_exp_14)
+
+#mapping
+
+map <- st_read("D:/Louis/IR resources/general-electoral-district-2007.csv")
+map2007 <- st_read("D:/Louis/IR project/general-electoral-district-2007.csv")
+map2014 <- st_read("D:/Louis/IR project/general-electoral-district-2014.csv")
+
+colnames(map)[2] <- "Electorate"
+colnames(map2007)[2] <- "Electorate"
+colnames(map2014)[2] <- "Electorate"
+map2014[26,2]<-	"Rangitikei"
+
+map_and_data <- inner_join(tradeshock.a, map)
+tradeshockmap2005 <- inner_join(trade2005, map)
+
+
+map_and_data = st_as_sf(map_and_data)
+tm_shape(map_and_data)+
+  tm_polygons("tradeshock.a",id="Electorate")
+
+tradeshockmap = st_as_sf(tradeshockmap)
+tm_shape(tradeshockmap)+
+  tm_polygons("tradeshock",id="Electorate")
+
+tradeshockmap2005 = st_as_sf(tradeshockmap2005)
+tm_shape(tradeshockmap2005)+
+  tm_polygons("tradeshock2005",id="Electorate")
+
+
+trade2005$Electorate==map$Electorate
+
+
+
+tradeshockmap2014 = st_as_sf(tradeshockmap2014)
+tm_shape(tradeshockmap2014)+
+  tm_polygons("tradeshock",id="Electorate")
+
+tradeshockmap2011 <- inner_join(trade2011, map2014)
+tradeshockmap2011 = st_as_sf(tradeshockmap2011)
+tm_shape(tradeshockmap2011)+
+  tm_polygons("tradeshock2011",id="Electorate")
+
+#For potential future use when looking at pre-2011 tradeshock
+#Calculating trade shock
+
+M_change <- sum(DATASET3[c(7:22),4])
+EP06$"Electorate Population" <- rowSums(EP06)
+L_i<- rowSums(EP06)
+as.numeric (L_i)
+L_nz <- sum(EP06$`Electorate Population`)
+L_mi <- EP06$`2006Manufacturing`
+as.numeric(L_mi)
+
+tradeshock <- (L_mi / L_nz)*(M_change/ L_i)
+print(tradeshock)
+tradeshock.m <- as.data.frame(tradeshock)
+tradeshock.m$"Electorate" <- row.names(tradeshock.m)
+row.names(tradeshock.m) <- 1:63
+tradeshock.m<- tradeshock.m[,c("Electorate","tradeshock")]
+
+
+#Agricultural tradeshcok from China to NZ
+
+L_ai <- EP06[,1]
+as.numeric(L_ai)
+M.a_change <- DATASET3[1,4] + DATASET3[2,4]
+tradeshock.a <- (L_ai / L_nz)*(M.a_change/ L_i)
+tradeshock.a <- as.data.frame(tradeshock.a)
+tradeshock.a$"Electorate" <- row.names(tradeshock.a)
+row.names(tradeshock.a) <- 1:63
+
+tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
+
+#(To see the state of trade in 2005)
+tradeshock2005 <- (L_mi/L_nz)*(M_0/L_i)
+trade2005 <- as.data.frame(tradeshock2005)
+trade2005$"Electorate" <- row.names(trade2005)
+row.names(trade2005) <- 1:63
+trade2005<-trade2005[,c("Electorate","tradeshock2005")]
+
+
+### CODE STOPS HERE ###
+#writing Trade/DATASET3 (preparatory work)
+chn_nzl_exp_05<-read.csv("trade 2005.csv")
+chn_nzl_exp_08 <-read.csv("trade 2008.csv")
+chn_nzl_exp_07 <-read.csv("trade 2007.csv")
+chn_nzl_exp_11 <-read.csv("trade 2011.csv")
+chn_nzl_exp_14 <-read.csv("trade 2014.csv")
+chn_nzl_exp_17 <-read.csv("trade 2017.csv")
+
+
+tradechange <- merge (chn_nzl_exp_05, chn_nzl_exp_08, by ="industry")
+colnames(tradechange)[2] <- "exp05"
+colnames(tradechange)[3] <- "exp08"
+tradechange$"change05-08" <- tradechange[,3] - tradechange[,2]
+
+tradechange <- merge (tradechange, chn_nzl_exp_11, by="industry")
+colnames(tradechange)[5] <- "exp11"
+tradechange$"change08-11" <- tradechange[,5] - tradechange [,3]
+
+tradechange <- merge (tradechange, chn_nzl_exp_14, by="industry")
+colnames(tradechange)[7] <- "exp14"
+tradechange$"change11-14" <- tradechange[,7] - tradechange [,5]
+
+tradechange <- merge (tradechange, chn_nzl_exp_17, by="industry")
+colnames(tradechange)[9] <- "exp17"
+tradechange$"change14-17" <- tradechange[,9] - tradechange [,7]
+
+write.csv(tradechange, "trade data.csv", row.names = FALSE)
+DATATSET3 <- read.csv ("trade data.csv")
+
+DATATSET3[1,1] <- "Agriculture, hunting, forestry"
+DATATSET3[2,1] <- "Fishing and aquaculture"
+DATATSET3[3,1] <-"Mining and quarrying, energy producing products"
+DATATSET3[4,1] <-"Mining and quarrying, non-energy producing products"
+DATATSET3[5,1] <-"Mining support service activities"
+DATATSET3[6,1] <-"Food products, beverages and tobacco"
+DATATSET3[7,1] <-"Textiles, textile products, leather and footwear"
+DATATSET3[8,1] <-"Wood and products of wood and cork"
+DATATSET3[9,1] <-"Paper products and printing"
+DATATSET3[10,1] <-"Coke and refined petroleum products"
+DATATSET3[11,1] <-"Chemical and chemical products"
+DATATSET3[12,1] <-"Pharmaceuticals, medicinal chemical and botanical products"
+DATATSET3[13,1] <-"Rubber and plastics products"
+DATATSET3[14,1] <-"Other non-metallic mineral products"
+DATATSET3[15,1] <-"Basic metals"
+DATATSET3[16,1] <-"Fabricated metal products"
+DATATSET3[17,1] <-"Computer, electronic and optical equipment"
+DATATSET3[18,1] <-"Electrical equipment"
+DATATSET3[19,1] <-"Machinery and equipment, nec "
+DATATSET3[20,1] <-"Motor vehicles, trailers and semi-trailers"
+DATATSET3[21,1] <-"Other transport equipment"
+DATATSET3[22,1] <-"Manufacturing nec; repair and installation of machinery and equipment"
+DATATSET3[23,1] <-"Electricity, gas, steam and air conditioning supply"
+DATATSET3[24,1] <-"Water supply; sewerage, waste management and remediation activities"
+DATATSET3[25,1] <-"Construction"
+DATATSET3[26,1] <-"Wholesale and retail trade; repair of motor vehicles"
+DATATSET3[27,1] <-"Land transport and transport via pipelines"
+DATATSET3[28,1] <-"Water transport"
+DATATSET3[29,1] <-"Air transport"
+DATATSET3[30,1] <-"Warehousing and support activities for transportation"
+DATATSET3[31,1] <-"Postal and courier activities"
+DATATSET3[32,1] <-"Accommodation and food service activities"
+DATATSET3[33,1] <-"Publishing, audiovisual and broadcasting activities"
+DATATSET3[34,1] <-"Telecommunications"
+DATATSET3[35,1] <-"IT and other information services"
+DATATSET3[36,1] <-"Financial and insurance activities"
+DATATSET3[37,1] <-"Real estate activities"
+DATATSET3[38,1] <-"Professional, scientific and technical activities"
+DATATSET3[39,1] <-"Administrative and support services"
+DATATSET3[40,1] <-"Public administration and defence; compulsory social security"
+DATATSET3[41,1] <-"Education"
+DATATSET3[42,1] <-"Human health and social work activities"
+DATATSET3[43,1] <-"Arts, entertainment and recreation"
+DATATSET3[44,1] <-"Other service activities"
+DATATSET3[45,1] <-"Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use"
+write.csv(DATATSET3, "DATASET3", row.names = FALSE)
+
+
+#Writing trade data (preparatory work)
 icio_95_chn_cn2 <- data.frame(icio_95[substr(icio_95$X, 1, 3) %in% c ("CN2"), 
                                       substr(colnames(icio_95), 1, 3) == "NZL"])
 
@@ -334,320 +676,6 @@ chn_nzl_exp_17 <- data.frame(industry = substr(colnames(icio_17_chn_cn2),
                                                5, nchar(colnames(icio_17_chn_cn2))), 
                              exp_val = chn_nzl_exp_17)
 write.csv(chn_nzl_exp_17, "trade 2017.csv", row.names=FALSE)
-
-
-
-#Trade
-chn_nzl_exp_05<-read.csv("trade 2005.csv")
-chn_nzl_exp_08 <-read.csv("trade 2008.csv")
-chn_nzl_exp_07 <-read.csv("trade 2007.csv")
-chn_nzl_exp_11 <-read.csv("trade 2011.csv")
-chn_nzl_exp_14 <-read.csv("trade 2014.csv")
-chn_nzl_exp_17 <-read.csv("trade 2017.csv")
-
-
-
-
-tradechange <- merge (chn_nzl_exp_05, chn_nzl_exp_08, by ="industry")
-colnames(tradechange)[2] <- "exp05"
-colnames(tradechange)[3] <- "exp08"
-tradechange$"change05-08" <- tradechange[,3] - tradechange[,2]
-
-tradechange <- merge (tradechange, chn_nzl_exp_11, by="industry")
-colnames(tradechange)[5] <- "exp11"
-tradechange$"change08-11" <- tradechange[,5] - tradechange [,3]
-
-tradechange <- merge (tradechange, chn_nzl_exp_14, by="industry")
-colnames(tradechange)[7] <- "exp14"
-tradechange$"change11-14" <- tradechange[,7] - tradechange [,5]
-
-tradechange <- merge (tradechange, chn_nzl_exp_17, by="industry")
-colnames(tradechange)[9] <- "exp17"
-tradechange$"change14-17" <- tradechange[,9] - tradechange [,7]
-
-write.csv(tradechange, "trade data.csv", row.names = FALSE)
-DATATSET3 <- read.csv ("trade data.csv")
-
-DATATSET3[1,1] <- "Agriculture, hunting, forestry"
-DATATSET3[2,1] <- "Fishing and aquaculture"
-DATATSET3[3,1] <-"Mining and quarrying, energy producing products"
-DATATSET3[4,1] <-"Mining and quarrying, non-energy producing products"
-DATATSET3[5,1] <-"Mining support service activities"
-DATATSET3[6,1] <-"Food products, beverages and tobacco"
-DATATSET3[7,1] <-"Textiles, textile products, leather and footwear"
-DATATSET3[8,1] <-"Wood and products of wood and cork"
-DATATSET3[9,1] <-"Paper products and printing"
-DATATSET3[10,1] <-"Coke and refined petroleum products"
-DATATSET3[11,1] <-"Chemical and chemical products"
-DATATSET3[12,1] <-"Pharmaceuticals, medicinal chemical and botanical products"
-DATATSET3[13,1] <-"Rubber and plastics products"
-DATATSET3[14,1] <-"Other non-metallic mineral products"
-DATATSET3[15,1] <-"Basic metals"
-DATATSET3[16,1] <-"Fabricated metal products"
-DATATSET3[17,1] <-"Computer, electronic and optical equipment"
-DATATSET3[18,1] <-"Electrical equipment"
-DATATSET3[19,1] <-"Machinery and equipment, nec "
-DATATSET3[20,1] <-"Motor vehicles, trailers and semi-trailers"
-DATATSET3[21,1] <-"Other transport equipment"
-DATATSET3[22,1] <-"Manufacturing nec; repair and installation of machinery and equipment"
-DATATSET3[23,1] <-"Electricity, gas, steam and air conditioning supply"
-DATATSET3[24,1] <-"Water supply; sewerage, waste management and remediation activities"
-  DATATSET3[25,1] <-"Construction"
-  DATATSET3[26,1] <-"Wholesale and retail trade; repair of motor vehicles"
-  DATATSET3[27,1] <-"Land transport and transport via pipelines"
-  DATATSET3[28,1] <-"Water transport"
-  DATATSET3[29,1] <-"Air transport"
-  DATATSET3[30,1] <-"Warehousing and support activities for transportation"
-  DATATSET3[31,1] <-"Postal and courier activities"
-  DATATSET3[32,1] <-"Accommodation and food service activities"
-  DATATSET3[33,1] <-"Publishing, audiovisual and broadcasting activities"
-  DATATSET3[34,1] <-"Telecommunications"
-  DATATSET3[35,1] <-"IT and other information services"
-  DATATSET3[36,1] <-"Financial and insurance activities"
-  DATATSET3[37,1] <-"Real estate activities"
-  DATATSET3[38,1] <-"Professional, scientific and technical activities"
-  DATATSET3[39,1] <-"Administrative and support services"
-  DATATSET3[40,1] <-"Public administration and defence; compulsory social security"
-  DATATSET3[41,1] <-"Education"
-  DATATSET3[42,1] <-"Human health and social work activities"
-  DATATSET3[43,1] <-"Arts, entertainment and recreation"
-  DATATSET3[44,1] <-"Other service activities"
-  DATATSET3[45,1] <-"Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use"
-  DATASET3 <- DATATSET3
-  
-  
-#Calculating trade shock
-M_0 <- sum(DATASET3[c(7:22),2])
-M_1 <- sum(DATASET3[c(7:22),3])
-
-M_change <- sum(DATASET3[c(7:22),4])
-tradechange <- M_1 - M_0
-
-rowsum(EP06, EP06[,1])
-EP06<- read.csv("https://raw.githubusercontent.com/robinwyj/nztrade/main/ElectorateProfile08")
-EP06 <- EP06[1:63,]                                                                                                   
-EP06 <- EP06[,2:21]
-
-EP2006 <- EP06[,-1]
-rownames(EP2006) <- EP06[,1]
-as.numeric(EP2006)
-
-
-
-EP2006$"Electorate Population" <- rowSums(EP2006)
-L_i<- rowSums(EP2006)
-as.numeric (L_i)
-L_nz <- sum(EP2006$`Electorate Population`)
-L_mi <- EP2006[,3]
-as.numeric(L_mi)
-
-tradeshock2005 <- (L_mi/L_nz)*(M_0/L_i)
-trade2005 <- as.data.frame(tradeshock2005)
-trade2005$"Electorate" <- row.names(trade2005)
-row.names(trade2005) <- 1:63
-trade2005<-trade2005[,c("Electorate","tradeshock2005")]
-
-
-tradeshock <- (L_mi / L_nz)*(M_change/ L_i)
-print(tradeshock)
-DATASET4 <- as.data.frame(tradeshock)
-DATASET4$"Electorate" <- row.names(DATASET4)
-row.names(DATASET4) <- 1:63
-as.numeric(DATASET4)
-
-DATASET4<-DATASET4[,c("Electorate","tradeshock")]
-
-tradeshock <- as.data.frame(tradeshock)
-tradeshock$"Electorate" <- row.names(tradeshock)
-row.names(tradeshock) <- 1:63
-
-tradeshock<-tradeshock[,c("Electorate","tradeshock")]
-
-
-
-L_ai <- EP2006[,1]
-as.numeric(L_ai)
-M.a_change <- DATASET3[1,4] + DATASET3[2,4]
-tradeshock.a <- (L_ai / L_nz)*(M.a_change/ L_i)
-tradeshock.a <- as.data.frame(tradeshock.a)
-tradeshock.a$"Electorate" <- row.names(tradeshock.a)
-row.names(tradeshock.a) <- 1:63
-
-tradeshock.a<-tradeshock.a[,c("Electorate","tradeshock.a")]
-
-
-
-
-
-
-#mapping
-
-map <- st_read("D:/Louis/IR project/general-electoral-district-2002.csv")
-map2007 <- st_read("D:/Louis/IR project/general-electoral-district-2007.csv")
-map2014 <- st_read("D:/Louis/IR project/general-electoral-district-2014.csv")
-
-colnames(map)[2] <- "Electorate"
-colnames(map2007)[2] <- "Electorate"
-colnames(map2014)[2] <- "Electorate"
-map2014[26,2]<-	"Rangitikei"
-
-map_and_data <- inner_join(tradeshock.a, map)
-tradeshockmap2005 <- inner_join(trade2005, map)
-
-
-map_and_data = st_as_sf(map_and_data)
-tm_shape(map_and_data)+
-  tm_polygons("tradeshock.a",id="Electorate")
-
-tradeshockmap = st_as_sf(tradeshockmap)
-tm_shape(tradeshockmap)+
-  tm_polygons("tradeshock",id="Electorate")
-
-tradeshockmap2005 = st_as_sf(tradeshockmap2005)
-tm_shape(tradeshockmap2005)+
-  tm_polygons("tradeshock2005",id="Electorate")
-
-
-trade2005$Electorate==map$Electorate
-
-
-
-tradeshockmap2014 = st_as_sf(tradeshockmap2014)
-tm_shape(tradeshockmap2014)+
-  tm_polygons("tradeshock",id="Electorate")
-
-#trials
-map_and_data$geometry <- "MULTIPOLYGON"
-
-plot(st_geometry(map))
-choroLayer(x=map_and_data, var="tradeshock.a", method="equal")
-
-
-
-ggplot(map_and_data )+
-  geom_sf(aes(fill="tradeshock.a"))
-  rlang::last_error()
-
-ggplot(general_electoral_district_2002) +
-  geo_sf(aes(fill= "SHAPE"))
-
-
-
-#Tradeshock and voting for 2011-2014 using the 2013 census, using 2011 as t0
-M_0 <- sum(DATASET3[c(7:22),7])
-EP13 <- read.csv("ep17.csv")
-EP13 <- EP13[,2:ncol(EP13)]
-
-rownames(EP13) <- EP13[,1]
-EP13<- EP13[,-1]
-EP13$"Electorate Population" <- rowSums(EP13)
-
-L_i<- rowSums(EP13)
-as.numeric (L_i)
-L_nz <- sum(EP13$`Electorate Population`)
-L_mi <- EP13[,3]
-as.numeric(L_mi)
-
-tradeshock2011 <- (L_mi/L_nz)*(M_0/L_i)
-trade2011 <- as.data.frame(tradeshock2011)
-trade2011$"Electorate" <- row.names(trade2011)
-row.names(trade2011) <- 1:64
-trade2011<-trade2011[,c("Electorate","tradeshock2011")]
-
-
-
-tradeshockmap2011 <- inner_join(trade2011, map2014)
-tradeshockmap2011 = st_as_sf(tradeshockmap2011)
-tm_shape(tradeshockmap2011)+
-  tm_polygons("tradeshock2011",id="Electorate")
-
-                           
-
-
-
-                     
-#Looking at the 2014 election
-M_change <- sum(DATASET3[c(7:22),8])
-
-tradeshock2014 <- (L_mi/L_nz)*(M_change/L_i)
-trade2014 <- as.data.frame(tradeshock2014)
-trade2014$"Electorate" <- row.names(trade2014)
-row.names(trade2014) <- 1:64
-trade2014<-trade2014[,c("Electorate","tradeshock2014")]
-
-
-
-tradeshockmap2014 <- inner_join(trade2014, map2014)
-tradeshockmap2014 = st_as_sf(tradeshockmap2014)
-tm_shape(tradeshockmap2014)+
-  tm_polygons("tradeshock2014",id="Electorate")
-
-
-
-#Regression
-df1114<- merge(DATASET1, trade2014, by="Electorate")
-shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014, data=df1114)
-summary(shock1114)
-df1114robust<-lm_robust(df1114$`Winning Margin 2011-2014` ~ tradeshock2014, data=df1114)
-summary(df1114robust)
-
-(Covar1114 <- vcovHC(shock1114))
-(Estvar1114 <- diag(result1114))
-
- stargazer(shock1114,
-          se = list(sqrt(Estvar1114)),
-          type = "text",
-          header = FALSE)
- 
- #Adding Control Variables
- #Percentage of rural population
- EP13 <- read.csv("ep17.csv")
- EP13 <- EP13[,2:ncol(EP13)]
- EP13<-EP13[,1:19]
- colnames(EP13) <- paste0("2013",colnames(EP13))
- colnames(EP13)[1] <- "Electorate"
- EP13$"Electorate Population" <- rowSums(EP13[,c(2:19)])
- 
- EP13$"RuralPopulation" <- EP13$`2013A.Agriculture..Forestry.and.Fishing`/EP13$`Electorate Population`
- Ruralpop <- EP13[,c(1,21)]
- df1114agri <- merge (Ruralpop, df1114, by = "Electorate")
- shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + RuralPopulation + tradeshock2014*RuralPopulation, data=df1114agri)
- summary (shock1114)
- 
- 
- #Testing for unemployment benefits and education
- EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
-                                                  sheet = "22", skip = 2)
-EP13education <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
-                            sheet = "7", skip = 1)
-EP13education$"Tertiaryedu" <- rowSums(EP13education[,10:13])
-EP13education$"Tertiaryedu"<- EP13education$Tertiaryedu/EP13education$Total
-df1114edu <- merge (EP13education, df1114, by = "Electorate")
-shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu, data=df1114edu)
-summary(shock1114)
- 
-df1114agriedu <- merge (df1114agri, EP13education, by="Electorate")
-shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Tertiaryedu + df1114agriedu$RuralPopulation
-                + tradeshock2014*Tertiaryedu + tradeshock2014*EP13$RuralPopulation, data=df1114agriedu)
-summary(shock1114)
-
-
-#Testing unemployment compensation
-EP13benefits <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
-                           sheet = "22", skip = 2)
-EP13unemploy <- read_excel("2013 Electorate-profiles---raw-data.xlsx", 
-                           sheet = "23", skip = 2)
-EP13benefits <- EP13benefits[1:64,c(1,3)]
-EP13unemploy <- EP13unemploy[1:64, c(1,4)]
-Compensation <- merge (EP13benefits, EP13unemploy, by="Electorate")
-colnames(Compensation)[3] <- "Unemployed"
-Compensation$Compensated <- as.numeric(Compensation$`Unemployment benefit`)/as.numeric(Compensation$`Unemployed`)
-df1114Comp <- merge (df1114, Compensation, by= "Electorate")
-
-
-shock1114 <- lm(df1114$`Winning Margin 2011-2014` ~ tradeshock2014 + Compensated
-            , data=df1114Comp)
-summary(shock1114)
 
 
  # Obsolete Below are codes comiling data and writing csv.
@@ -899,6 +927,21 @@ summary(shock1114)
  plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2011.2014)
  plot(df2$tradeshock.a, df2$Winning.Margin.Percentage.2014.2017)
  
+ #trials
+ map_and_data$geometry <- "MULTIPOLYGON"
+ 
+ plot(st_geometry(map))
+ choroLayer(x=map_and_data, var="tradeshock.a", method="equal")
+ 
+ 
+ 
+ ggplot(map_and_data )+
+   geom_sf(aes(fill="tradeshock.a"))
+ rlang::last_error()
+ 
+ ggplot(general_electoral_district_2002) +
+   geo_sf(aes(fill= "SHAPE"))
+ 
  
 
  
@@ -932,5 +975,20 @@ summary(shock1114)
  lm_robust(Winning.Margin.Percentage.2008.2011 ~ tradeshock, data=df)
  help("lm_robust")
  
+ EP06 <- for (i in 2:20) {
+   EP06[,i] <- as.numeric(EP06[,i])
+   EP06[,i] <-  EP06[,i]/ sum( EP06[,i])
+ }
+ 
+ EP13 <- for (i in 2:21) {
+   EP13[,i] <- as.numeric(EP13[,i])
+   EP13[,i] <-  EP13[,i]/ sum( EP13[,i])
+ }
+ 
+ # optional?
+ all_cty <- unique(substr(colnames(icio_07), 1, 3))[-1]
+ all_cty <- all_cty[-c(72:length(all_cty))]
+ all_cty <- all_cty[!all_cty== "NZL"]
+ #
  
  
